@@ -19,6 +19,7 @@ model User {
     firstName String @map("first_name")
     lastName String @map("last_name")
     password String
+    refreshToken String? @map("refresh_token") @db.VarChar(256)
 }
 
 

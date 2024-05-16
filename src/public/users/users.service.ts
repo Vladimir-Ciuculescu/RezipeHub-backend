@@ -2,32 +2,53 @@ import {
   ConflictException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
+  forwardRef,
 } from '@nestjs/common';
 import { PrismaService } from 'prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { hashPassword } from 'src/utils/hashPassword';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
 
   async findUser(email: string) {
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
 
     return user;
   }
 
   async createUser(body: CreateUserDto) {
-    const { email, firstName, lastName, password } = body;
+    const {
+      email,
+      firstName,
+      lastName,
+      password,
+      //refreshToken
+    } = body;
 
     const existentUser = await this.prismaService.user.findUnique({
-      where: { email },
+      where: {
+        email,
+      },
     });
 
     if (existentUser) {
       throw new HttpException(
-        { error: 'This email address is already in use !' },
+        {
+          error: 'This email address is already in use !',
+        },
         HttpStatus.CONFLICT,
       );
     }
@@ -35,8 +56,18 @@ export class UsersService {
     const hashedPassword = await hashPassword(password);
 
     const user = await this.prismaService.user.create({
-      data: { email, password: hashedPassword, firstName, lastName },
+      data: {
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        // refreshToken,
+      },
     });
+
+    // const tokens = await this.authService.getTokens(user.id, user.email);
+
+    // await this.authService.updateRefreshToken(user.id, tokens.refreshToken);
 
     return user;
   }
