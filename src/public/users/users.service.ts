@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   HttpException,
   HttpStatus,
   Inject,
@@ -13,11 +12,7 @@ import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findUser(email: string) {
     const user = await this.prismaService.user.findUnique({
@@ -30,13 +25,7 @@ export class UsersService {
   }
 
   async createUser(body: CreateUserDto) {
-    const {
-      email,
-      firstName,
-      lastName,
-      password,
-      //refreshToken
-    } = body;
+    const { email, firstName, lastName, password } = body;
 
     const existentUser = await this.prismaService.user.findUnique({
       where: {
@@ -61,13 +50,8 @@ export class UsersService {
         password: hashedPassword,
         firstName,
         lastName,
-        // refreshToken,
       },
     });
-
-    // const tokens = await this.authService.getTokens(user.id, user.email);
-
-    // await this.authService.updateRefreshToken(user.id, tokens.refreshToken);
 
     return user;
   }
