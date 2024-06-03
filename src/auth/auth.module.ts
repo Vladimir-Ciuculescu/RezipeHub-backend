@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshJwtStrategy } from './strategies/refresh-jwt.strategy';
 import { EmailService } from 'src/email/email.service';
+import { TokenService } from 'src/token/token.service';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EmailService } from 'src/email/email.service';
     UsersService,
     EmailService,
     PrismaService,
+    TokenService,
     LocalStrategy,
     JwtStrategy,
     RefreshJwtStrategy,

@@ -1,22 +1,17 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { hashPassword } from 'src/utils/hashPassword';
 import { EmailService } from 'src/email/email.service';
-import { generateToken } from 'src/utils/generateToken';
-import * as moment from 'moment';
+import { TokenService } from 'src/token/token.service';
+import { generateOtpToken } from 'src/utils/generateToken';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly emailService: EmailService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async findUser(email: string) {
@@ -52,7 +47,7 @@ export class UsersService {
 
     const hashedPassword = await hashPassword(password);
 
-    const token = generateToken();
+    const token = generateOtpToken();
 
     const user = await this.prismaService.user.create({
       data: {
@@ -63,6 +58,10 @@ export class UsersService {
         lastName,
       },
     });
+
+    const payload = { userId: user.id, email };
+
+    await this.tokenService.generateToken(token, payload);
 
     await this.emailService.sendMail(
       email,
@@ -78,16 +77,6 @@ This token is valid for 24 hours. If you did not request this verification, plea
 Best regards,
 Yumhub`,
     );
-
-    const expirationDate = moment().add(24, 'hours').toDate();
-
-    await this.prismaService.token.create({
-      data: {
-        userId: user.id,
-        token: token.toString(),
-        expiresAt: expirationDate,
-      },
-    });
 
     return user;
   }

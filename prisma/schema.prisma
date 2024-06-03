@@ -15,6 +15,7 @@ model User {
   firstName    String  @map("first_name")
   lastName     String  @map("last_name")
   password     String
+  isVerified  Boolean @default(false) @map("is_verified")
   refreshToken String? @map("refresh_token") @db.VarChar(256)
   tokens       Token[]
 }
