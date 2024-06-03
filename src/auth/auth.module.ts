@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshJwtStrategy } from './strategies/refresh-jwt.strategy';
+import { EmailService } from 'src/email/email.service';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RefreshJwtStrategy } from './strategies/refresh-jwt.strategy';
   providers: [
     AuthService,
     UsersService,
+    EmailService,
     PrismaService,
     LocalStrategy,
     JwtStrategy,
