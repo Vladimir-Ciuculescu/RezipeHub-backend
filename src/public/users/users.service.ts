@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { hashPassword } from 'src/utils/hashPassword';
@@ -11,6 +17,7 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly emailService: EmailService,
+    @Inject(forwardRef(() => TokenService))
     private readonly tokenService: TokenService,
   ) {}
 
@@ -79,5 +86,16 @@ Yumhub`,
     );
 
     return user;
+  }
+
+  async validateUser(userId: number) {
+    try {
+      await this.prismaService.user.update({
+        where: { id: userId },
+        data: { isVerified: true },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

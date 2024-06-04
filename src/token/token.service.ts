@@ -1,15 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma.service';
 import { generateOtpToken } from 'src/utils/generateToken';
 import * as moment from 'moment';
 import { CreateTokenDto } from './dtos/create-token.dto';
 import { EmailService } from 'src/email/email.service';
+import { ConfirmTokenDto } from './dtos/confirm-token.dto';
+import { UsersService } from 'src/public/users/users.service';
 
 @Injectable()
 export class TokenService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly emailService: EmailService,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
   ) {}
 
   async generateToken(token: string, payload: CreateTokenDto) {
@@ -26,6 +36,36 @@ export class TokenService {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async confirmToken(payload: ConfirmTokenDto) {
+    const { userId, token } = payload;
+
+    const tokenObj = await this.prismaService.token.findFirst({
+      where: { userId },
+    });
+
+    if (!tokenObj) {
+      throw new HttpException(
+        { error: 'Token not found or expired !' },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    const now = new Date();
+
+    if (tokenObj.token !== token || tokenObj.expiresAt < now) {
+      throw new HttpException(
+        { error: 'Token not found or expired !' },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    await this.usersService.validateUser(userId);
+
+    await this.deleteToken(tokenObj.id);
+
+    return { message: 'User validated !' };
   }
 
   async resendToken(payload: CreateTokenDto) {
@@ -54,6 +94,14 @@ Thank you for using our service!
 Best regards,
 Your App Name Team`,
       );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async deleteToken(tokenId: number) {
+    try {
+      await this.prismaService.token.delete({ where: { id: tokenId } });
     } catch (error) {
       console.log(error);
     }
