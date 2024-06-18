@@ -36,6 +36,8 @@ export class AuthController {
     return this.authService.login(user);
   }
 
+  //TODO: Implement social login endpoint
+
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Get('/profile')

@@ -26,7 +26,7 @@ export class TokenService {
     const { userId } = payload;
 
     try {
-      await this.prismaService.token.create({
+      await this.prismaService.tokens.create({
         data: {
           userId,
           token,
@@ -41,7 +41,7 @@ export class TokenService {
   async confirmToken(payload: ConfirmTokenDto) {
     const { userId, token } = payload;
 
-    const tokenObj = await this.prismaService.token.findFirst({
+    const tokenObj = await this.prismaService.tokens.findFirst({
       where: { userId },
     });
 
@@ -72,7 +72,7 @@ export class TokenService {
     const { userId, email } = payload;
 
     try {
-      await this.prismaService.token.deleteMany({ where: { userId } });
+      await this.prismaService.tokens.deleteMany({ where: { userId } });
       const token = generateOtpToken();
 
       await this.generateToken(token, payload);
@@ -101,7 +101,7 @@ Your App Name Team`,
 
   async deleteToken(tokenId: number) {
     try {
-      await this.prismaService.token.delete({ where: { id: tokenId } });
+      await this.prismaService.tokens.delete({ where: { id: tokenId } });
     } catch (error) {
       console.log(error);
     }

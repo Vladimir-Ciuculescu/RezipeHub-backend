@@ -57,7 +57,7 @@ export class AuthService {
   }
 
   async refreshTokens(data, oldRefreshToken: string) {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.users.findUnique({
       where: { id: data.id },
     });
 
@@ -106,7 +106,7 @@ export class AuthService {
   async updateRefreshToken(userId: number, refreshToken: string) {
     const hashedToken = await bcrypt.hash(refreshToken, 10);
 
-    await this.prismaService.user.update({
+    await this.prismaService.users.update({
       where: {
         id: userId,
       },

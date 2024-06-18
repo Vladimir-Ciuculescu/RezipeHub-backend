@@ -22,7 +22,7 @@ export class UsersService {
   ) {}
 
   async findUser(email: string) {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.users.findUnique({
       where: {
         email,
       },
@@ -34,7 +34,7 @@ export class UsersService {
   async createUser(body: CreateUserDto) {
     const { email, username, firstName, lastName, password } = body;
 
-    const existentUser = await this.prismaService.user.findFirst({
+    const existentUser = await this.prismaService.users.findFirst({
       where: { OR: [{ email }, { username }] },
     });
 
@@ -56,7 +56,7 @@ export class UsersService {
 
     const token = generateOtpToken();
 
-    const user = await this.prismaService.user.create({
+    const user = await this.prismaService.users.create({
       data: {
         username,
         email,
@@ -65,6 +65,8 @@ export class UsersService {
         lastName,
       },
     });
+
+    // await this.prismaService.auth_methods.create({data:{provider:'FACEBOOK', providerId:5, userId:6}})
 
     const payload = { userId: user.id, email };
 
@@ -90,7 +92,7 @@ Yumhub`,
 
   async validateUser(userId: number) {
     try {
-      await this.prismaService.user.update({
+      await this.prismaService.users.update({
         where: { id: userId },
         data: { isVerified: true },
       });
