@@ -9,8 +9,9 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/public/users/dtos/create-user.dto';
 import { UsersService } from 'src/public/users/users.service';
 import * as bcrypt from 'bcrypt';
-import { RequestUser } from 'src/public/users/dtos/request-user.dto';
 import { PrismaService } from 'prisma.service';
+import { UserRequest } from 'src/public/users/dtos/user-request.dto';
+import { SocialUserRequest } from 'src/public/users/dtos/social-user-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: RequestUser) {
+  async login(user: UserRequest) {
     const payload = {
       email: user.email,
       id: user.id,
@@ -48,6 +49,74 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(payload);
 
     await this.updateRefreshToken(user.id, refreshToken);
+
+    return {
+      user: { ...payload },
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  async socialLogin(user: SocialUserRequest) {
+    const { email, provider, providerUserId, firstName, lastName } = user;
+
+    let payload;
+
+    const existentUser = await this.prismaService.users.findFirst({
+      where: { email: email },
+    });
+
+    //! : Possible need to change findFirst method
+    if (existentUser) {
+      const existentAuthMethod =
+        await this.prismaService.auth_methods.findFirst({
+          where: { AND: [{ userId: existentUser.id }, { provider: provider }] },
+        });
+
+      if (existentAuthMethod) {
+        await this.prismaService.auth_methods.updateMany({
+          where: { AND: [{ userId: existentUser.id }, { provider: provider }] },
+          data: { providerId: providerUserId },
+        });
+      } else {
+        await this.prismaService.auth_methods.create({
+          data: {
+            userId: existentUser.id,
+            provider: provider,
+            providerId: providerUserId,
+          },
+        });
+      }
+
+      const { id, email, firstName, lastName } = existentUser;
+
+      payload = {
+        email: email,
+        id: id,
+        firstName: firstName,
+        lastName: lastName,
+      };
+    } else {
+      const newUser = await this.prismaService.users.create({
+        data: { email: email, firstName: firstName, lastName: lastName },
+      });
+
+      await this.prismaService.auth_methods.create({
+        data: {
+          provider: provider,
+          providerId: providerUserId,
+          userId: newUser.id,
+        },
+      });
+
+      payload = {
+        email: newUser.email,
+        id: newUser.id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+      };
+    }
+    const { accessToken, refreshToken } = await this.generateTokens(payload);
 
     return {
       user: { ...payload },

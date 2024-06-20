@@ -15,10 +15,10 @@ enum social_provider_enum {
 model users {
   id             Int            @id @default(autoincrement())
   email          String         @unique
-  username       String         @unique
+  username       String?         @unique
   firstName      String         @map("first_name")
   lastName       String         @map("last_name")
-  password       String
+  password       String?
   isVerified     Boolean        @default(false) @map("is_verified")
   refreshToken   String?        @map("refresh_token") @db.VarChar(256)
   tokens         tokens[]
@@ -28,12 +28,12 @@ model users {
 }
 
 model auth_methods {
-  id         Int                  @id @default(autoincrement())
-  provider   social_provider_enum
-  providerId String               @map("provider_id")
-  userId     Int                  @map("user_id")
-  user       users                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt  DateTime             @default(now()) @map("created_at")
+  id         Int                   @id @default(autoincrement())
+  provider   social_provider_enum?
+  providerId String?               @map("provider_id")
+  userId     Int                   @map("user_id")
+  user       users                 @relation(fields: [userId], references: [id])
+  createdAt  DateTime              @default(now()) @map("created_at")
 
   @@unique([provider, providerId])
 }

@@ -66,11 +66,17 @@ export class UsersService {
       },
     });
 
-    // await this.prismaService.auth_methods.create({data:{provider:'FACEBOOK', providerId:5, userId:6}})
+    const tokenPayload = { userId: user.id, email };
 
-    const payload = { userId: user.id, email };
+    await this.prismaService.auth_methods.create({
+      data: {
+        provider: null,
+        providerId: null,
+        user: { connect: { id: user.id } },
+      },
+    });
 
-    await this.tokenService.generateToken(token, payload);
+    await this.tokenService.generateToken(token, tokenPayload);
 
     await this.emailService.sendMail(
       email,

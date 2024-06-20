@@ -1,6 +1,6 @@
 import { IsEmail, IsNumber, IsString } from 'class-validator';
 
-export class RequestUser {
+export class UserRequest {
   @IsNumber()
   id: number;
 
