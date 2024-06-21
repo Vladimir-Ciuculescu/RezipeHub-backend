@@ -1,7 +1,7 @@
 import { IsEnum, IsString, isString } from 'class-validator';
 import { SocialProvider } from 'types/enums';
 
-export class SocialUserRequest {
+export class SocialUserRequestDto {
   @IsEnum(SocialProvider)
   provider: SocialProvider;
 

@@ -10,8 +10,8 @@ import { CreateUserDto } from 'src/public/users/dtos/create-user.dto';
 import { UsersService } from 'src/public/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'prisma.service';
-import { UserRequest } from 'src/public/users/dtos/user-request.dto';
-import { SocialUserRequest } from 'src/public/users/dtos/social-user-request.dto';
+import { UserRequestDto } from 'src/public/users/dtos/user-request.dto';
+import { SocialUserRequestDto } from 'src/public/users/dtos/social-user-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +38,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: UserRequest) {
+  async login(user: UserRequestDto) {
     const payload = {
       email: user.email,
       id: user.id,
@@ -57,7 +57,7 @@ export class AuthService {
     };
   }
 
-  async socialLogin(user: SocialUserRequest) {
+  async socialLogin(user: SocialUserRequestDto) {
     const { email, provider, providerUserId, firstName, lastName } = user;
 
     let payload;

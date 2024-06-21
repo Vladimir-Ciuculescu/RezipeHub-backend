@@ -12,10 +12,15 @@ enum social_provider_enum {
   FACEBOOK
 }
 
+enum token_type {
+  ACCOUNT_VERIFICATION
+  PASSWORD_RESET
+}
+
 model users {
   id             Int            @id @default(autoincrement())
   email          String         @unique
-  username       String?         @unique
+  username       String?        @unique
   firstName      String         @map("first_name")
   lastName       String         @map("last_name")
   password       String?
@@ -39,9 +44,10 @@ model auth_methods {
 }
 
 model tokens {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   token     String
-  expiresAt DateTime @map("expires_at")
-  userId    Int      @map("user_id")
-  user      users    @relation(fields: [userId], references: [id])
+  type      token_type
+  expiresAt DateTime   @map("expires_at")
+  userId    Int        @map("user_id")
+  user      users      @relation(fields: [userId], references: [id])
 }

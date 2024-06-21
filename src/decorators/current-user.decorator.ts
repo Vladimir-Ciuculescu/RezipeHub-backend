@@ -1,12 +1,12 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { Request } from 'express';
-import { UserRequest } from 'src/public/users/dtos/user-request.dto';
+import { UserRequestDto } from 'src/public/users/dtos/user-request.dto';
 
 declare global {
   namespace Express {
     interface Request {
       //@ts-ignore
-      user?: UserRequest;
+      user?: UserRequestDto;
     }
   }
 }

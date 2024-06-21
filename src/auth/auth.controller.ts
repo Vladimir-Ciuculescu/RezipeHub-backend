@@ -16,8 +16,9 @@ import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from 'src/public/users/dtos/user.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
-import { UserRequest } from 'src/public/users/dtos/user-request.dto';
-import { SocialUserRequest } from 'src/public/users/dtos/social-user-request.dto';
+import { UserRequestDto } from 'src/public/users/dtos/user-request.dto';
+import { SocialUserRequestDto } from 'src/public/users/dtos/social-user-request.dto';
+import { TokenService } from 'src/token/token.service';
 
 @Controller('auth')
 export class AuthController {
@@ -33,24 +34,24 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   @Post('/login')
-  loginUser(@CurrentUser() user: UserRequest) {
+  loginUser(@CurrentUser() user: UserRequestDto) {
     return this.authService.login(user);
   }
 
-  //TODO: Implement social login endpoint
   @HttpCode(200)
   @Post('/social-login')
-  socialLoginUser(@Body() body: SocialUserRequest) {
+  socialLoginUser(@Body() body: SocialUserRequestDto) {
     return this.authService.socialLogin(body);
   }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Get('/profile')
-  getProfile(@CurrentUser() user: UserRequest) {
+  getProfile(@CurrentUser() user: UserRequestDto) {
     return user;
   }
 
+  // * Refresh the token
   @UseGuards(RefreshJwtGuard)
   @HttpCode(201)
   @Get('/refresh')

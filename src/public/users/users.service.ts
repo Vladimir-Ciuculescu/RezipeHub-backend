@@ -10,7 +10,9 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { hashPassword } from 'src/utils/hashPassword';
 import { EmailService } from 'src/email/email.service';
 import { TokenService } from 'src/token/token.service';
-import { generateOtpToken } from 'src/utils/generateToken';
+import { generateToken } from 'src/utils/generateToken';
+import { CreateTokenDto } from 'src/token/dtos/create-token.dto';
+import { TokenType } from 'types/enums';
 
 @Injectable()
 export class UsersService {
@@ -54,7 +56,7 @@ export class UsersService {
 
     const hashedPassword = await hashPassword(password);
 
-    const token = generateOtpToken();
+    const token = generateToken(4);
 
     const user = await this.prismaService.users.create({
       data: {
@@ -66,7 +68,10 @@ export class UsersService {
       },
     });
 
-    const tokenPayload = { userId: user.id, email };
+    const tokenPayload: CreateTokenDto = {
+      userId: user.id,
+      email,
+    };
 
     await this.prismaService.auth_methods.create({
       data: {

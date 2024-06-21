@@ -2,3 +2,8 @@ export enum SocialProvider {
   GOOGLE = 'GOOGLE',
   FACEBOOK = 'FACEBOOK',
 }
+
+export enum TokenType {
+  ACCOUNT_VERIFICATION = 'ACCOUNT_VERIFICATION',
+  PASSWORD_RESET = 'PASSWORD_RESET',
+}
