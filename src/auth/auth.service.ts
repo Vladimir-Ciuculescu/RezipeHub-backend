@@ -1,5 +1,7 @@
 import {
   BadGatewayException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
@@ -12,6 +14,9 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'prisma.service';
 import { UserRequestDto } from 'src/public/users/dtos/user-request.dto';
 import { SocialUserRequestDto } from 'src/public/users/dtos/social-user-request.dto';
+import { ResetPasswordRequestDto } from 'src/public/users/dtos/reset-password-request.dto';
+import { TokenType } from 'types/enums';
+import { hashPassword } from 'src/utils/hashPassword';
 
 @Injectable()
 export class AuthService {
@@ -123,6 +128,53 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
+  }
+
+  async resetPassword(payload: ResetPasswordRequestDto) {
+    const { email, token, password } = payload;
+
+    const user = await this.prismaService.users.findFirst({
+      where: { email: email },
+    });
+
+    if (!user) {
+      throw new HttpException(
+        { error: 'User not found !' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const storedToken = await this.prismaService.tokens.findFirst({
+      where: { AND: [{ userId: user.id }, { type: TokenType.PASSWORD_RESET }] },
+    });
+
+    const now = new Date();
+
+    if (
+      !storedToken ||
+      storedToken.token !== token ||
+      storedToken.expiresAt < now
+    ) {
+      throw new HttpException(
+        { error: 'Token not valid or expired' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    await this.prismaService.users.update({
+      where: {
+        email: email,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    await this.prismaService.tokens.deleteMany({
+      where: { AND: [{ userId: user.id }, { type: TokenType.PASSWORD_RESET }] },
+    });
   }
 
   async refreshTokens(data, oldRefreshToken: string) {

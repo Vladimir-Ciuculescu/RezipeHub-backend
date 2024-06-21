@@ -18,7 +18,7 @@ import { UserDto } from 'src/public/users/dtos/user.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
 import { UserRequestDto } from 'src/public/users/dtos/user-request.dto';
 import { SocialUserRequestDto } from 'src/public/users/dtos/social-user-request.dto';
-import { TokenService } from 'src/token/token.service';
+import { ResetPasswordRequestDto } from 'src/public/users/dtos/reset-password-request.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -42,6 +42,12 @@ export class AuthController {
   @Post('/social-login')
   socialLoginUser(@Body() body: SocialUserRequestDto) {
     return this.authService.socialLogin(body);
+  }
+
+  @HttpCode(200)
+  @Post('/reset-password')
+  resetPassword(@Body() body: ResetPasswordRequestDto) {
+    return this.authService.resetPassword(body);
   }
 
   @UseGuards(JwtAuthGuard)
