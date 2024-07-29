@@ -28,6 +28,7 @@ model users {
   refreshToken   String?        @map("refresh_token") @db.VarChar(256)
   tokens         tokens[]
   socialProvider auth_methods[]
+  recipes        recipes[]
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedtAt     DateTime       @default(now()) @map("updated_at")
 }
@@ -50,4 +51,45 @@ model tokens {
   expiresAt DateTime   @map("expires_at")
   userId    Int        @map("user_id")
   user      users      @relation(fields: [userId], references: [id])
+}
+
+model recipes {
+  id          Int                   @id @default(autoincrement())
+  user        users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+  title       String
+  servings    Int
+  photoUrl    String?
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedtAt  DateTime              @default(now()) @map("updated_at")
+  ingredients recipes_ingredients[]
+  steps       steps[]
+}
+
+model ingredients {
+  id       Int                   @id @default(autoincrement())
+  name     String
+  unit     String
+  quantity Int
+  calories Float
+  carbs    Float
+  proteins Float
+  fats     Float
+  recipes  recipes_ingredients[]
+}
+
+model recipes_ingredients {
+  id           Int         @id @default(autoincrement())
+  recipe       recipes     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId     Int
+  ingredient   ingredients @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  ingredientId Int
+}
+
+model steps {
+  id       Int     @id @default(autoincrement())
+  recipe   recipes @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId Int
+  step     Int
+  text     String
 }
