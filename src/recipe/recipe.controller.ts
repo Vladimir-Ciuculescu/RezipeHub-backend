@@ -17,7 +17,10 @@ export class RecipeController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(201)
   @Post('/add')
-  addRecipe(@Body() body: CreateRecipeDto) {
+  // addRecipe(@Body() body: CreateRecipeDto) {
+  //   return this.recipeService.createRecipe(body);
+  // }
+  addRecipe(@Body() body: any) {
     return this.recipeService.createRecipe(body);
   }
 }

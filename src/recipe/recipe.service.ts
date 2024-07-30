@@ -7,10 +7,16 @@ export class RecipeService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createRecipe(payload: CreateRecipeDto) {
-    console.log(333, payload);
+    try {
+      const { userId, title, servings, photoUrl, ingredients, steps } = payload;
 
-    await this.prismaService.$transaction(async (tsx) => {
-      // await tsx.recipes.create({data:{t}})
-    });
+      await this.prismaService.$transaction([
+        this.prismaService.recipes.create({
+          data: { title, userId, servings, photoUrl },
+        }),
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
