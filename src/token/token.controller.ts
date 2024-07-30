@@ -9,13 +9,13 @@ export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 
   @HttpCode(200)
-  @Post('confirm')
+  @Post('/confirm')
   confirmToken(@Body() body: ConfirmTokenDto) {
     return this.tokenService.confirmToken(body);
   }
 
   @HttpCode(201)
-  @Post('resend')
+  @Post('/resend')
   resendToken(@Query() query: CreateTokenDto) {
     return this.tokenService.resendToken(query);
   }

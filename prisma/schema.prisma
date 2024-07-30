@@ -38,7 +38,7 @@ model auth_methods {
   provider   social_provider_enum?
   providerId String?               @map("provider_id")
   userId     Int                   @map("user_id")
-  user       users                 @relation(fields: [userId], references: [id])
+  user       users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime              @default(now()) @map("created_at")
 
   @@unique([provider, providerId])
@@ -50,16 +50,16 @@ model tokens {
   type      token_type
   expiresAt DateTime   @map("expires_at")
   userId    Int        @map("user_id")
-  user      users      @relation(fields: [userId], references: [id])
+  user      users      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model recipes {
   id          Int                   @id @default(autoincrement())
   user        users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
+  userId      Int                   @map("user_id")
   title       String
   servings    Int
-  photoUrl    String?
+  photoUrl    String?               @map("photo_url")
   createdAt   DateTime              @default(now()) @map("created_at")
   updatedtAt  DateTime              @default(now()) @map("updated_at")
   ingredients recipes_ingredients[]

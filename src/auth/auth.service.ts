@@ -67,12 +67,15 @@ export class AuthService {
 
     let payload;
 
+    let userId;
+
     const existentUser = await this.prismaService.users.findFirst({
       where: { email: email },
     });
 
     //! : Possible need to change findFirst method
     if (existentUser) {
+      userId = existentUser.id;
       const existentAuthMethod =
         await this.prismaService.auth_methods.findFirst({
           where: { AND: [{ userId: existentUser.id }, { provider: provider }] },
@@ -106,6 +109,8 @@ export class AuthService {
         data: { email: email, firstName: firstName, lastName: lastName },
       });
 
+      userId = newUser.id;
+
       await this.prismaService.auth_methods.create({
         data: {
           provider: provider,
@@ -122,6 +127,8 @@ export class AuthService {
       };
     }
     const { accessToken, refreshToken } = await this.generateTokens(payload);
+
+    await this.updateRefreshToken(userId, refreshToken);
 
     return {
       user: { ...payload },
