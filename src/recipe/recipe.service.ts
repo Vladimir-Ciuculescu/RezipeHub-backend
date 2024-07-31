@@ -10,11 +10,21 @@ export class RecipeService {
     try {
       const { userId, title, servings, photoUrl, ingredients, steps } = payload;
 
-      await this.prismaService.$transaction([
-        this.prismaService.recipes.create({
+      return await this.prismaService.$transaction(async (tsx) => {
+        const newRecipe = await tsx.recipes.create({
           data: { title, userId, servings, photoUrl },
-        }),
-      ]);
+        });
+
+        for (let ingredient of ingredients) {
+          const newIngredient = await tsx.ingredients.create({
+            data: ingredient,
+          });
+
+          await tsx.recipes_ingredients.create({
+            data: { recipeId: newRecipe.id, ingredientId: newIngredient.id },
+          });
+        }
+      });
     } catch (error) {
       console.log(error);
     }

@@ -54,7 +54,7 @@ model tokens {
 }
 
 model recipes {
-  id          Int                   @id @default(autoincrement())
+  id          Int                   @id @default(autoincrement()) 
   user        users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int                   @map("user_id")
   title       String
@@ -71,7 +71,7 @@ model ingredients {
   name     String
   unit     String
   quantity Int
-  calories Float
+  calories Float   
   carbs    Float
   proteins Float
   fats     Float
