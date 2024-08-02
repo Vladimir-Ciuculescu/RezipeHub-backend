@@ -24,6 +24,14 @@ export class RecipeService {
             data: { recipeId: newRecipe.id, ingredientId: newIngredient.id },
           });
         }
+
+        const stepsPayload = steps.map((step) => ({
+          recipeId: newRecipe.id,
+          step: step.step,
+          text: step.text,
+        }));
+
+        await tsx.steps.createMany({ data: stepsPayload });
       });
     } catch (error) {
       console.log(error);
