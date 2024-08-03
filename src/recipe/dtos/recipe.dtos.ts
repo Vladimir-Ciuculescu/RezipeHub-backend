@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
@@ -36,4 +36,32 @@ export class CreateRecipeDto {
   @Type(() => StepDto)
   @ArrayMinSize(1)
   steps: StepDto[];
+}
+
+export class RecipesPerUserDto {
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.page))
+  page: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.limit))
+  limit: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.userId))
+  userId: number;
+}
+
+export class RecipeBriefInfoDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  title: string;
+
+  @Expose()
+  servings: number;
+
+  @Expose()
+  photoUrl: string;
 }

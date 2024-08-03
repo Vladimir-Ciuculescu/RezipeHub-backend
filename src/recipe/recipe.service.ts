@@ -1,10 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRecipeDto } from './dtos/create-recipe.dto';
+import {
+  BadGatewayException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { CreateRecipeDto, RecipesPerUserDto } from './dtos/recipe.dtos';
 import { PrismaService } from 'prisma.service';
 
 @Injectable()
 export class RecipeService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async getRecipesByUser(query: RecipesPerUserDto) {
+    const { page, limit, userId } = query;
+
+    try {
+      const recipes = await this.prismaService.recipes.findMany({
+        where: { userId },
+      });
+      return recipes;
+    } catch (error) {
+      throw new BadGatewayException();
+      console.log(error);
+    }
+  }
 
   async createRecipe(payload: CreateRecipeDto) {
     try {
