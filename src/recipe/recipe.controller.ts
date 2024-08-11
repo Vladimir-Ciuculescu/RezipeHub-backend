@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -25,15 +26,23 @@ export class RecipeController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(new SerializeInterceptor(RecipeBriefInfoDto))
   @HttpCode(200)
-  @Get('/')
+  @Get('/user-recipes')
   getRecipesByUser(@Query() query: RecipesPerUserDto) {
     return this.recipeService.getRecipesByUser(query);
   }
 
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(new SerializeInterceptor(RecipeBriefInfoDto))
   @HttpCode(201)
   @Post('/add')
   addRecipe(@Body() body: CreateRecipeDto) {
     return this.recipeService.createRecipe(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Get('/:id')
+  getRecipe(@Param('id') id: string) {
+    return this.recipeService.getRecipe(parseInt(id));
   }
 }

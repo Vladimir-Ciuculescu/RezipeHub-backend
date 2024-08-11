@@ -199,7 +199,8 @@ export class AuthService {
     );
 
     if (!isMatchRefreshToken) {
-      throw new NotFoundException();
+      //throw new
+      throw new BadGatewayException();
     }
 
     const payload = {

@@ -1,6 +1,9 @@
 import {
   BadGatewayException,
+  HttpException,
+  HttpStatus,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateRecipeDto, RecipesPerUserDto } from './dtos/recipe.dtos';
@@ -16,11 +19,14 @@ export class RecipeService {
     try {
       const recipes = await this.prismaService.recipes.findMany({
         where: { userId },
+        skip: page * limit,
+        take: limit,
       });
       return recipes;
     } catch (error) {
-      throw new BadGatewayException();
       console.log(error);
+
+      throw new BadGatewayException();
     }
   }
 
@@ -50,7 +56,50 @@ export class RecipeService {
         }));
 
         await tsx.steps.createMany({ data: stepsPayload });
+
+        return newRecipe;
       });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getRecipe(id) {
+    try {
+      const recipe = await this.prismaService.recipes.findUnique({
+        where: { id },
+        include: {
+          ingredients: {
+            include: {
+              ingredient: true,
+            },
+          },
+          steps: true,
+        },
+      });
+
+      const flattenedIngredients = recipe.ingredients.map((item) => ({
+        id: item.ingredient.id,
+        name: item.ingredient.name,
+        unit: item.ingredient.unit,
+        quantity: item.ingredient.quantity,
+        calories: item.ingredient.calories,
+        carbs: item.ingredient.carbs,
+        proteins: item.ingredient.proteins,
+        fats: item.ingredient.fats,
+      }));
+
+      const flattenedSteps = recipe.steps.map((step) => ({
+        id: step.id,
+        step: step.step,
+        text: step.text,
+      }));
+
+      return {
+        ...recipe,
+        ingredients: flattenedIngredients,
+        steps: flattenedSteps,
+      };
     } catch (error) {
       console.log(error);
     }
