@@ -1,4 +1,12 @@
-import { IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { MeasureDto } from 'src/measure/dtos/measure.dto';
 
 export class IngredientDto {
   @IsString()
@@ -21,4 +29,13 @@ export class IngredientDto {
 
   @IsNumber()
   fats: number;
+
+  @IsString()
+  foodId: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MeasureDto)
+  @ArrayMinSize(1)
+  measures: MeasureDto[];
 }

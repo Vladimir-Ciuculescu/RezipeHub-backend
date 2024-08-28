@@ -54,28 +54,52 @@ model tokens {
 }
 
 model recipes {
-  id          Int                   @id @default(autoincrement()) 
+  id          Int                   @id @default(autoincrement())
   user        users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int                   @map("user_id")
   title       String
   servings    Int
   photoUrl    String?               @map("photo_url")
-  createdAt   DateTime              @default(now()) @map("created_at")
-  updatedtAt  DateTime              @default(now()) @map("updated_at")
   ingredients recipes_ingredients[]
   steps       steps[]
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime              @default(now()) @map("updated_at")
 }
 
 model ingredients {
-  id       Int                   @id @default(autoincrement())
-  name     String
-  unit     String
-  quantity Int
-  calories Float   
-  carbs    Float
-  proteins Float
-  fats     Float
-  recipes  recipes_ingredients[]
+  id      Int                   @id @default(autoincrement())
+  foodId  String                @unique @map("food_id")
+  name    String
+  units   ingredient_units[]
+  recipes recipes_ingredients[]
+}
+
+model units {
+  id              Int                @id @default(autoincrement())
+  uri             String             @unique
+  label           String             @unique
+  ingredientUnits ingredient_units[]
+}
+
+model ingredient_units {
+  id              Int                           @id @default(autoincrement())
+  ingredient      ingredients                   @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  ingredientId    Int
+  unit            units                         @relation(fields: [unitId], references: [id])
+  unitId          Int
+  weight          Float // Specific weight for this unit-ingredient combination
+  nutritionalInfo ingredient_nutritional_info[]
+}
+
+model ingredient_nutritional_info {
+  id               Int              @id @default(autoincrement())
+  ingredientUnit   ingredient_units @relation(fields: [ingredientUnitId], references: [id], onDelete: Cascade)
+  ingredientUnitId Int
+  quantity         Float
+  calories         Float
+  carbs            Float
+  proteins         Float
+  fats             Float
 }
 
 model recipes_ingredients {
