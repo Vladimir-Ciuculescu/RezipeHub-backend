@@ -5,6 +5,7 @@ import {
   HttpCode,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
   UseInterceptors,
@@ -12,6 +13,8 @@ import {
 import { RecipeService } from './recipe.service';
 import {
   CreateRecipeDto,
+  EditRecipeDto,
+  EditRecipePhotoDto,
   RecipeBriefInfoDto,
   RecipesPerUserDto,
 } from './dtos/recipe.dtos';
@@ -36,6 +39,20 @@ export class RecipeController {
   @Post('/add')
   addRecipe(@Body() body: CreateRecipeDto) {
     return this.recipeService.createRecipe(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(202)
+  @Put('/edit-photo')
+  editRecipePhoto(@Body() body: EditRecipePhotoDto) {
+    return this.recipeService.editRecipePhoto(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(202)
+  @Put('/edit')
+  editRecipe(@Body() body: EditRecipeDto) {
+    return this.recipeService.editRecipe(body);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -4,12 +4,23 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { CreateRecipeDto, RecipesPerUserDto } from './dtos/recipe.dtos';
+import {
+  CreateRecipeDto,
+  EditRecipeDto,
+  EditRecipePhotoDto,
+  RecipesPerUserDto,
+} from './dtos/recipe.dtos';
 import { PrismaService } from 'prisma.service';
+import { IngredientsService } from 'src/ingredients/ingredients.service';
+import { UnitsService } from 'src/units/units.service';
 
 @Injectable()
 export class RecipeService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly ingredientsService: IngredientsService,
+    private readonly unitsService: UnitsService,
+  ) {}
 
   async getRecipesByUser(query: RecipesPerUserDto) {
     const { page, limit, userId } = query;
@@ -33,37 +44,39 @@ export class RecipeService {
 
   async createRecipe(payload: CreateRecipeDto) {
     try {
-      const { userId, title, servings, photoUrl, ingredients, steps } = payload;
+      const {
+        userId,
+        title,
+        servings,
+
+        ingredients,
+        steps,
+      } = payload;
 
       return await this.prismaService.$transaction(async (tsx) => {
         const newRecipe = await tsx.recipes.create({
-          data: { title, userId, servings, photoUrl },
+          data: {
+            title,
+            userId,
+            servings,
+          },
         });
 
         for (let ingredient of ingredients) {
-          const {
-            foodId,
-            name,
-            measures,
-            quantity,
-            calories,
-            carbs,
-            proteins,
-            fats,
-          } = ingredient;
+          const { foodId, name, measures, calories, carbs, proteins, fats } =
+            ingredient;
 
-          const existingIngredient = await tsx.ingredients.findUnique({
-            where: { foodId },
-          });
+          const existingIngredient =
+            await this.ingredientsService.getIngredient(foodId);
 
           let ingredientId;
 
           if (existingIngredient) {
             ingredientId = existingIngredient.id;
           } else {
-            const newIngredient = await tsx.ingredients.create({
-              data: { foodId, name },
-            });
+            const payload = { foodId, name };
+            const newIngredient =
+              await this.ingredientsService.addIngredient(payload);
             ingredientId = newIngredient.id;
           }
 
@@ -76,16 +89,13 @@ export class RecipeService {
 
             let measureId;
 
-            const existingMeasure = await tsx.units.findFirst({
-              where: { AND: [{ uri }, { label }] },
-            });
+            const payload = { uri, label };
+            const existingMeasure = await this.unitsService.getUnit(payload);
 
             if (existingMeasure) {
               measureId = existingMeasure.id;
             } else {
-              const newMeasure = await tsx.units.create({
-                data: { uri, label },
-              });
+              const newMeasure = await this.unitsService.addUnit(payload);
               measureId = newMeasure.id;
             }
 
@@ -102,39 +112,6 @@ export class RecipeService {
                 },
               });
             }
-
-            // const newIngredientUnit = await tsx.ingredient_units.create({
-            //   data: {
-            //     ingredientId: ingredientId,
-            //     unitId: measureId,
-            //     weight,
-            //   },
-            // });
-
-            // if (!nutritionalInfoCreated) {
-            //   await tsx.ingredient_nutritional_info.upsert({
-            //     where: {
-            //       ingredientUnitId: newIngredientUnit.id,
-            //     },
-
-            //     update: {
-            //       quantity,
-            //       calories,
-            //       fats,
-            //       carbs,
-            //       proteins,
-            //     },
-            //     create: {
-            //       quantity,
-            //       calories,
-            //       fats,
-            //       carbs,
-            //       proteins,
-            //       ingredientUnitId: newIngredientUnit.id,
-            //     },
-            //   });
-            //   nutritionalInfoCreated = true;
-            // }
           }
 
           const currentUnit = await tsx.units.findUnique({
@@ -147,23 +124,6 @@ export class RecipeService {
             },
           });
 
-          // const existentIngredientNutritionalInfo =
-          //   await tsx.ingredient_nutritional_info.findUnique({
-          //     where: { ingredientUnitId: ingredientUnit.id },
-          //   });
-
-          // if (!existentIngredientNutritionalInfo) {
-          //   await tsx.ingredient_nutritional_info.create({
-          //     data: {
-          //       ingredientUnitId: ingredientUnit.id,
-          //       quantity: ingredient.quantity,
-          //       calories,
-          //       carbs,
-          //       proteins,
-          //       fats,
-          //     },
-          //   });
-          // }
           await tsx.ingredient_nutritional_info.create({
             data: {
               ingredientUnitId: ingredientUnit.id,
@@ -188,9 +148,102 @@ export class RecipeService {
       console.log(error);
 
       throw new HttpException(
-        { error: 'Token not valid or expired' },
+        { error: 'Could not create recipe !' },
         HttpStatus.CONFLICT,
       );
+    }
+  }
+
+  async editRecipePhoto(payload: EditRecipePhotoDto) {
+    const { id, photoUrl } = payload;
+
+    await this.prismaService.recipes.update({
+      where: { id },
+      data: { photoUrl },
+    });
+  }
+
+  async editRecipe(payload: EditRecipeDto) {
+    const { recipe, ingredientsIds, nutritionalInfoIds, stepsIds } = payload;
+
+    try {
+      const { id, title, servings, photoUrl, ingredients, steps } = recipe;
+
+      return await this.prismaService.$transaction(async (tsx) => {
+        await tsx.recipes.update({
+          where: { id },
+          data: { title, servings, photoUrl },
+        });
+
+        if (ingredientsIds) {
+          await tsx.recipes_ingredients.deleteMany({
+            where: {
+              AND: [
+                {
+                  ingredientId: {
+                    in: ingredientsIds,
+                  },
+                },
+                { recipeId: id },
+              ],
+            },
+          });
+        }
+
+        if (nutritionalInfoIds) {
+          await tsx.ingredient_nutritional_info.deleteMany({
+            where: {
+              id: {
+                in: nutritionalInfoIds,
+              },
+            },
+          });
+        }
+
+        for (let ingredient of ingredients) {
+          const { calories, carbs, proteins, fats, quantity } = ingredient;
+          let nutritionalInfoId = ingredient.nutritionalInfoId;
+
+          const unit = await tsx.units.findFirst({
+            where: { label: ingredient.measure },
+          });
+
+          const ingredientUnit = await tsx.ingredient_units.findFirst({
+            where: {
+              AND: [{ ingredientId: ingredient.id }, { unitId: unit.id }],
+            },
+          });
+
+          await tsx.ingredient_nutritional_info.update({
+            where: { id: nutritionalInfoId },
+
+            data: {
+              calories,
+              carbs,
+              proteins,
+              fats,
+              quantity,
+              ingredientUnitId: ingredientUnit.id,
+            },
+          });
+        }
+
+        if (stepsIds) {
+          await tsx.steps.deleteMany({
+            where: { AND: [{ id: { in: stepsIds } }, { recipeId: recipe.id }] },
+          });
+        }
+
+        for (let step of steps) {
+          await tsx.steps.update({
+            where: { id: step.id },
+            data: { text: step.description },
+          });
+        }
+      });
+    } catch (error) {
+      throw new HttpException({ error }, HttpStatus.CONFLICT);
+      console.log(error);
     }
   }
 
@@ -207,6 +260,7 @@ export class RecipeService {
                     unit: true,
                     nutritionalInfo: {
                       select: {
+                        id: true,
                         quantity: true,
                         calories: true,
                         carbs: true,
@@ -248,11 +302,19 @@ export class RecipeService {
           .flatMap((unit) => unit.nutritionalInfo)
           .filter((info) => info.quantity !== undefined);
 
+        const allUnits = ingredient.units.map((unit) => ({
+          label: unit.unit.label,
+          uri: unit.unit.uri,
+        }));
+
         return {
           id: ingredient.id,
           foodId: ingredient.foodId,
           name: ingredient.name,
           unit: primaryUnitInfo?.unit.label || null,
+          allUnits,
+
+          nutritionalInfoId: nutritionalInfo[0].id,
           quantity: nutritionalInfo[0]?.quantity || null,
           calories: nutritionalInfo[0]?.calories || null,
           carbs: nutritionalInfo[0]?.carbs || null,

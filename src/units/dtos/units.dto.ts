@@ -1,6 +1,6 @@
 import { IsNumber, IsString } from 'class-validator';
 
-export class MeasureDto {
+export class CreateUnitDto {
   @IsString()
   uri: string;
 
@@ -9,4 +9,12 @@ export class MeasureDto {
 
   @IsNumber()
   weight: number;
+}
+
+export class UnitDto {
+  @IsString()
+  uri: string;
+
+  @IsString()
+  label: string;
 }

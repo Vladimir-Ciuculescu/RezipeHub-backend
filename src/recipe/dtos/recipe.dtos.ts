@@ -8,8 +8,11 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { IngredientDto } from 'src/ingredient/dtos/ingredient.dto';
-import { StepDto } from 'src/step/dtos/step.dto';
+import {
+  EditIngredientDto,
+  IngredientDto,
+} from 'src/ingredients/dtos/ingredient.dto';
+import { EditStepDto, StepDto } from 'src/steps/dtos/steps.dto';
 
 export class CreateRecipeDto {
   @IsNumber()
@@ -36,6 +39,61 @@ export class CreateRecipeDto {
   @Type(() => StepDto)
   @ArrayMinSize(1)
   steps: StepDto[];
+}
+
+export class EditRecipeObjectDto {
+  @IsNumber()
+  id: number;
+
+  @IsString()
+  title: string;
+
+  @IsNumber()
+  servings: number;
+
+  @IsString()
+  photoUrl: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EditIngredientDto)
+  @ArrayMinSize(1)
+  ingredients: EditIngredientDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EditStepDto)
+  @ArrayMinSize(1)
+  steps: EditStepDto[];
+}
+
+export class EditRecipeDto {
+  @ValidateNested()
+  @Type(() => EditRecipeObjectDto)
+  recipe: EditRecipeObjectDto;
+
+  @IsArray()
+  @IsOptional()
+  @IsNumber({}, { each: true })
+  ingredientsIds: number[];
+
+  @IsArray()
+  @IsOptional()
+  @IsNumber({}, { each: true })
+  nutritionalInfoIds: number[];
+
+  @IsArray()
+  @IsOptional()
+  @IsNumber({}, { each: true })
+  stepsIds: number[];
+}
+
+export class EditRecipePhotoDto {
+  @IsNumber()
+  id: number;
+
+  @IsString()
+  photoUrl: string;
 }
 
 export class RecipesPerUserDto {

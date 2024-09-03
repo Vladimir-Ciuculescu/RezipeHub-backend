@@ -1,4 +1,4 @@
 import { Controller } from '@nestjs/common';
 
 @Controller('measure')
-export class MeasureController {}
+export class UnitsController {}

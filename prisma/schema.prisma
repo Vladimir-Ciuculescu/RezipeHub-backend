@@ -96,10 +96,10 @@ model ingredient_nutritional_info {
   ingredientUnit   ingredient_units @relation(fields: [ingredientUnitId], references: [id], onDelete: Cascade)
   ingredientUnitId Int
   quantity         Float
-  calories         Float
-  carbs            Float
-  proteins         Float
-  fats             Float
+  calories         Float?
+  carbs            Float?
+  proteins         Float?
+  fats             Float?
 }
 
 model recipes_ingredients {
