@@ -33,7 +33,7 @@ export class RecipeController {
     return this.recipeService.getRecipesByUser(query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @UseInterceptors(new SerializeInterceptor(RecipeBriefInfoDto))
   @HttpCode(201)
   @Post('/add')
