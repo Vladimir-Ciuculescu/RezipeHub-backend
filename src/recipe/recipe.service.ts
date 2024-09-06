@@ -28,13 +28,68 @@ export class RecipeService {
     try {
       const recipes = await this.prismaService.recipes.findMany({
         where: { userId },
+
         skip: page * limit,
         take: limit,
+        include: {
+          ingredients: {
+            include: {
+              ingredient: {
+                include: {
+                  units: {
+                    include: {
+                      unit: true,
+                      nutritionalInfo: {
+                        select: {
+                          id: true,
+                          quantity: true,
+                          calories: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         orderBy: {
           id: 'desc',
         },
       });
-      return recipes;
+
+      const formattedRecipes = recipes.map((recipe) => {
+        const newIngredients = recipe.ingredients.map((recipeIngredient) => {
+          const ingredient = recipeIngredient.ingredient;
+
+          const nutritionalInfo = ingredient.units
+            .flatMap((unit) => unit.nutritionalInfo)
+            .filter((info) => info.quantity !== undefined);
+
+          return {
+            id: ingredient.id,
+            foodId: ingredient.foodId,
+
+            quantity: nutritionalInfo[0]?.quantity || null,
+            calories: nutritionalInfo[0]?.calories || null,
+          };
+        });
+
+        const totalCalories = newIngredients.reduce((total, ingredient) => {
+          const calories = Number(ingredient.calories) ?? 0; // Default to 0 if undefined or null
+
+          return total + calories;
+        }, 0);
+
+        const { ingredients, ...formattedRecipe } = recipe;
+
+        return {
+          ...formattedRecipe,
+          totalCalories,
+        };
+      });
+
+      return formattedRecipes;
     } catch (error) {
       console.log(error);
 
@@ -48,7 +103,8 @@ export class RecipeService {
         userId,
         title,
         servings,
-
+        preparationTime,
+        type,
         ingredients,
         steps,
       } = payload;
@@ -59,6 +115,8 @@ export class RecipeService {
             title,
             userId,
             servings,
+            preparationTime,
+            type,
           },
         });
 
@@ -167,12 +225,21 @@ export class RecipeService {
     const { recipe, ingredientsIds, nutritionalInfoIds, stepsIds } = payload;
 
     try {
-      const { id, title, servings, photoUrl, ingredients, steps } = recipe;
+      const {
+        id,
+        title,
+        servings,
+        photoUrl,
+        ingredients,
+        steps,
+        type,
+        preparationTime,
+      } = recipe;
 
       return await this.prismaService.$transaction(async (tsx) => {
         await tsx.recipes.update({
           where: { id },
-          data: { title, servings, photoUrl },
+          data: { title, servings, photoUrl, type, preparationTime },
         });
 
         if (ingredientsIds) {
@@ -291,6 +358,8 @@ export class RecipeService {
       title: recipe.title,
       servings: recipe.servings,
       photoUrl: recipe.photoUrl,
+      preparationTime: recipe.preparationTime,
+      type: recipe.type,
       ingredients: recipe.ingredients.map((recipeIngredient) => {
         const ingredient = recipeIngredient.ingredient;
 
@@ -316,10 +385,18 @@ export class RecipeService {
 
           nutritionalInfoId: nutritionalInfo[0].id,
           quantity: nutritionalInfo[0]?.quantity || null,
-          calories: nutritionalInfo[0]?.calories || null,
-          carbs: nutritionalInfo[0]?.carbs || null,
-          proteins: nutritionalInfo[0]?.proteins || null,
-          fats: nutritionalInfo[0]?.fats || null,
+          calories: nutritionalInfo[0]?.calories
+            ? nutritionalInfo[0]?.calories.toNumber()
+            : null,
+          carbs: nutritionalInfo[0]?.carbs
+            ? nutritionalInfo[0].carbs.toNumber()
+            : null,
+          proteins: nutritionalInfo[0]?.proteins
+            ? nutritionalInfo[0]?.proteins.toNumber()
+            : null,
+          fats: nutritionalInfo[0]?.fats
+            ? nutritionalInfo[0]?.fats.toNumber()
+            : null,
         };
       }),
       steps: recipe.steps,

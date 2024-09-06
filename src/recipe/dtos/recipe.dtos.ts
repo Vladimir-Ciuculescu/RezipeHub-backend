@@ -2,6 +2,7 @@ import { Expose, Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
@@ -13,6 +14,7 @@ import {
   IngredientDto,
 } from 'src/ingredients/dtos/ingredient.dto';
 import { EditStepDto, StepDto } from 'src/steps/dtos/steps.dto';
+import { RecipeType } from 'types/enums';
 
 export class CreateRecipeDto {
   @IsNumber()
@@ -27,6 +29,12 @@ export class CreateRecipeDto {
   @IsOptional()
   @IsString()
   photoUrl: string;
+
+  @IsEnum(RecipeType)
+  type: RecipeType;
+
+  @IsNumber()
+  preparationTime: number;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -53,6 +61,12 @@ export class EditRecipeObjectDto {
 
   @IsString()
   photoUrl: string;
+
+  @IsEnum(RecipeType)
+  type: RecipeType;
+
+  @IsNumber()
+  preparationTime: number;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -122,4 +136,13 @@ export class RecipeBriefInfoDto {
 
   @Expose()
   photoUrl: string;
+
+  @Expose()
+  type: RecipeType;
+
+  @Expose()
+  preparationTime: number;
+
+  @Expose()
+  totalCalories: number;
 }

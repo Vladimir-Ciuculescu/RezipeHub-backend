@@ -54,16 +54,18 @@ model tokens {
 }
 
 model recipes {
-  id          Int                   @id @default(autoincrement())
-  user        users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int                   @map("user_id")
-  title       String
-  servings    Int
-  photoUrl    String?               @map("photo_url")
-  ingredients recipes_ingredients[]
-  steps       steps[]
-  createdAt   DateTime              @default(now()) @map("created_at")
-  updatedAt   DateTime              @default(now()) @map("updated_at")
+  id              Int                   @id @default(autoincrement())
+  user            users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int                   @map("user_id")
+  title           String
+  servings        Int
+  photoUrl        String?               @map("photo_url")
+  type            String
+  preparationTime Int                   @map("preparation_time")
+  ingredients     recipes_ingredients[]
+  steps           steps[]
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @default(now()) @map("updated_at")
 }
 
 model ingredients {
@@ -96,10 +98,10 @@ model ingredient_nutritional_info {
   ingredientUnit   ingredient_units @relation(fields: [ingredientUnitId], references: [id], onDelete: Cascade)
   ingredientUnitId Int
   quantity         Float
-  calories         Float?
-  carbs            Float?
-  proteins         Float?
-  fats             Float?
+  calories         Decimal?         @db.Decimal(10, 2)
+  carbs            Decimal?         @db.Decimal(10, 2)
+  proteins         Decimal?         @db.Decimal(10, 2)
+  fats             Decimal?         @db.Decimal(10, 2)
 }
 
 model recipes_ingredients {

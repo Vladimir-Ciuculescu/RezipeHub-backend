@@ -25,7 +25,7 @@ import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @UseInterceptors(new SerializeInterceptor(RecipeBriefInfoDto))
   @HttpCode(200)
   @Get('/user-recipes')
@@ -33,7 +33,7 @@ export class RecipeController {
     return this.recipeService.getRecipesByUser(query);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(new SerializeInterceptor(RecipeBriefInfoDto))
   @HttpCode(201)
   @Post('/add')
