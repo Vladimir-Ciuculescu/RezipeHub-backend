@@ -1,3 +1,4 @@
 {
-  "workbench.iconTheme": "bearded-icons"
+  "workbench.iconTheme": "bearded-icons",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -110,6 +110,38 @@ export class EditRecipePhotoDto {
   photoUrl: string;
 }
 
+export class RecipesDto {
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.page))
+  page: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.limit))
+  limit: number;
+
+  @IsOptional()
+  @IsString()
+  title: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categories: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(2)
+  @IsNumber({}, { each: true })
+  @Transform(({ value }) => (Array.isArray(value) ? value.map(Number) : []))
+  caloriesRange: number[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(2)
+  @IsNumber({}, { each: true })
+  preparationTimeRange: [min: number, max: number];
+}
+
 export class RecipesPerUserDto {
   @IsNumber()
   @Transform(({ obj }) => parseInt(obj.page))

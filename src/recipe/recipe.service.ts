@@ -8,6 +8,7 @@ import {
   CreateRecipeDto,
   EditRecipeDto,
   EditRecipePhotoDto,
+  RecipesDto,
   RecipesPerUserDto,
 } from './dtos/recipe.dtos';
 import { PrismaService } from 'prisma.service';
@@ -21,6 +22,40 @@ export class RecipeService {
     private readonly ingredientsService: IngredientsService,
     private readonly unitsService: UnitsService,
   ) {}
+
+  //TODO : Adjust the query so that it filters number of calories too
+  async getRecipes(query: RecipesDto) {
+    const { title, categories, caloriesRange, preparationTimeRange } = query;
+
+    try {
+      // const recipes = await this.prismaService
+      //   .$queryRaw`SELECT r.id, r.title, SUM(ini.calories)  as totalCalories
+      //   FROM recipes r
+      // JOIN recipes_ingredients ri ON r.id = ri."recipeId"
+      //   JOIN ingredients i ON ri."ingredientId" = i.id
+      //   JOIN ingredient_units iu ON iu."ingredientId" = i.id
+      //   JOIN ingredient_nutritional_info ini ON ini."ingredientUnitId" = iu.id
+      //   GROUP BY r.id;`;
+      // -- HAVING CAST(SUM(ini.calories * iu.weight) AS INTEGER) BETWEEN ${caloriesRange[0]} AND ${caloriesRange[1]};`;
+    } catch (error) {
+      console.log(error);
+      throw new BadGatewayException();
+    }
+
+    // try {
+    //   const recipes = await this.prismaService.recipes.findMany({
+    //     where: {
+    //       title: title ? { contains: title, mode: 'insensitive' } : undefined,
+    //       type: categories ? { in: categories } : undefined,
+    //     },
+    //   });
+
+    //   return recipes;
+    // } catch (error) {
+    //   console.log(error);
+    //   throw new BadGatewayException();
+    // }
+  }
 
   async getRecipesByUser(query: RecipesPerUserDto) {
     const { page, limit, userId } = query;
@@ -309,8 +344,8 @@ export class RecipeService {
         }
       });
     } catch (error) {
-      throw new HttpException({ error }, HttpStatus.CONFLICT);
       console.log(error);
+      throw new HttpException({ error }, HttpStatus.CONFLICT);
     }
   }
 

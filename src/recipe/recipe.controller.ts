@@ -16,6 +16,7 @@ import {
   EditRecipeDto,
   EditRecipePhotoDto,
   RecipeBriefInfoDto,
+  RecipesDto,
   RecipesPerUserDto,
 } from './dtos/recipe.dtos';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -24,6 +25,13 @@ import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 @Controller('recipes')
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
+
+  // @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Get('/')
+  getRecipes(@Query() query: RecipesDto) {
+    return this.recipeService.getRecipes(query);
+  }
 
   // @UseGuards(JwtAuthGuard)
   @UseInterceptors(new SerializeInterceptor(RecipeBriefInfoDto))

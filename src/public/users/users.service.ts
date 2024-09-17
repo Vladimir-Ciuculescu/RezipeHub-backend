@@ -12,7 +12,6 @@ import { EmailService } from 'src/email/email.service';
 import { TokenService } from 'src/token/token.service';
 import { generateToken } from 'src/utils/generateToken';
 import { CreateTokenDto } from 'src/token/dtos/create-token.dto';
-import { TokenType } from 'types/enums';
 
 @Injectable()
 export class UsersService {
