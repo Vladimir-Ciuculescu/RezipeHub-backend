@@ -1,20 +1,8 @@
-import { Expose, Transform, Type } from 'class-transformer';
-import {
-  ArrayMinSize,
-  IsArray,
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-import {
-  EditIngredientDto,
-  IngredientDto,
-} from 'src/ingredients/dtos/ingredient.dto';
-import { EditStepDto, StepDto } from 'src/steps/dtos/steps.dto';
-import { RecipeType } from 'types/enums';
+import { Expose, Transform, Type } from "class-transformer";
+import { ArrayMinSize, IsArray, IsEnum, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+import { EditIngredientDto, IngredientDto } from "src/ingredients/dtos/ingredient.dto";
+import { EditStepDto, StepDto } from "src/steps/dtos/steps.dto";
+import { RecipeType } from "types/enums";
 
 export class CreateRecipeDto {
   @IsNumber()
@@ -90,11 +78,6 @@ export class EditRecipeDto {
   @IsOptional()
   @IsNumber({}, { each: true })
   ingredientsIds: number[];
-
-  @IsArray()
-  @IsOptional()
-  @IsNumber({}, { each: true })
-  nutritionalInfoIds: number[];
 
   @IsArray()
   @IsOptional()

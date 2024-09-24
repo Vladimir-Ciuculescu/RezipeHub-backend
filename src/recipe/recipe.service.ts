@@ -1,19 +1,10 @@
-import {
-  BadGatewayException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
-import {
-  CreateRecipeDto,
-  EditRecipeDto,
-  EditRecipePhotoDto,
-  RecipesDto,
-  RecipesPerUserDto,
-} from './dtos/recipe.dtos';
-import { PrismaService } from 'prisma.service';
-import { IngredientsService } from 'src/ingredients/ingredients.service';
-import { UnitsService } from 'src/units/units.service';
+import { BadGatewayException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { CreateRecipeDto, EditRecipeDto, EditRecipePhotoDto, RecipesDto, RecipesPerUserDto } from "./dtos/recipe.dtos";
+import { PrismaService } from "prisma.service";
+import { IngredientsService } from "src/ingredients/ingredients.service";
+import { UnitsService } from "src/units/units.service";
+import { recipes_ingredients } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class RecipeService {
@@ -27,104 +18,39 @@ export class RecipeService {
   async getRecipes(query: RecipesDto) {
     const { title, categories, caloriesRange, preparationTimeRange } = query;
 
-    try {
-      // const recipes = await this.prismaService
-      //   .$queryRaw`SELECT r.id, r.title, SUM(ini.calories)  as totalCalories
-      //   FROM recipes r
-      // JOIN recipes_ingredients ri ON r.id = ri."recipeId"
-      //   JOIN ingredients i ON ri."ingredientId" = i.id
-      //   JOIN ingredient_units iu ON iu."ingredientId" = i.id
-      //   JOIN ingredient_nutritional_info ini ON ini."ingredientUnitId" = iu.id
-      //   GROUP BY r.id;`;
-      // -- HAVING CAST(SUM(ini.calories * iu.weight) AS INTEGER) BETWEEN ${caloriesRange[0]} AND ${caloriesRange[1]};`;
-    } catch (error) {
-      console.log(error);
-      throw new BadGatewayException();
-    }
+    const recipes = await this.prismaService.$queryRaw`SELECT 
+    r.id AS recipe_id,
+    r.title AS recipe_title,
+    SUM(ri.calories) AS total_calories
+  FROM 
+    recipes r
+  JOIN 
+    recipes_ingredients ri ON r.id = ri.recipe_id
+  GROUP BY 
+    r.id, r.title
+  HAVING 
+    SUM(ri.calories) BETWEEN ${caloriesRange[0]} AND ${caloriesRange[1]}
+  ORDER BY 
+    total_calories;`;
 
-    // try {
-    //   const recipes = await this.prismaService.recipes.findMany({
-    //     where: {
-    //       title: title ? { contains: title, mode: 'insensitive' } : undefined,
-    //       type: categories ? { in: categories } : undefined,
-    //     },
-    //   });
-
-    //   return recipes;
-    // } catch (error) {
-    //   console.log(error);
-    //   throw new BadGatewayException();
-    // }
+    return recipes;
   }
 
   async getRecipesByUser(query: RecipesPerUserDto) {
     const { page, limit, userId } = query;
 
     try {
-      const recipes = await this.prismaService.recipes.findMany({
-        where: { userId },
+      const recipes = await this.prismaService
+        .$queryRaw`SELECT r.id, r.title, r.servings, r."photo_url" AS "photoUrl", r.type, r."preparation_time" AS "preparationTime", CAST(ROUND(SUM(ri.calories::numeric), 2) AS float8) AS "totalCalories"
+      FROM recipes r
+      JOIN recipes_ingredients ri ON r.id = ri."recipe_id"
+      WHERE r."user_id" = ${userId}
+      GROUP BY r.id, r.title, r.servings, r.type, r."preparation_time" 
+      ORDER BY r."created_at" DESC
+      OFFSET ${page * limit} ROWS 
+      FETCH NEXT ${limit} ROWS only;`;
 
-        skip: page * limit,
-        take: limit,
-        include: {
-          ingredients: {
-            include: {
-              ingredient: {
-                include: {
-                  units: {
-                    include: {
-                      unit: true,
-                      nutritionalInfo: {
-                        select: {
-                          id: true,
-                          quantity: true,
-                          calories: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          id: 'desc',
-        },
-      });
-
-      const formattedRecipes = recipes.map((recipe) => {
-        const newIngredients = recipe.ingredients.map((recipeIngredient) => {
-          const ingredient = recipeIngredient.ingredient;
-
-          const nutritionalInfo = ingredient.units
-            .flatMap((unit) => unit.nutritionalInfo)
-            .filter((info) => info.quantity !== undefined);
-
-          return {
-            id: ingredient.id,
-            foodId: ingredient.foodId,
-
-            quantity: nutritionalInfo[0]?.quantity || null,
-            calories: nutritionalInfo[0]?.calories || null,
-          };
-        });
-
-        const totalCalories = newIngredients.reduce((total, ingredient) => {
-          const calories = Number(ingredient.calories) ?? 0; // Default to 0 if undefined or null
-
-          return total + calories;
-        }, 0);
-
-        const { ingredients, ...formattedRecipe } = recipe;
-
-        return {
-          ...formattedRecipe,
-          totalCalories,
-        };
-      });
-
-      return formattedRecipes;
+      return recipes;
     } catch (error) {
       console.log(error);
 
@@ -133,17 +59,9 @@ export class RecipeService {
   }
 
   async createRecipe(payload: CreateRecipeDto) {
-    try {
-      const {
-        userId,
-        title,
-        servings,
-        preparationTime,
-        type,
-        ingredients,
-        steps,
-      } = payload;
+    const { userId, title, servings, preparationTime, type, ingredients, steps } = payload;
 
+    try {
       return await this.prismaService.$transaction(async (tsx) => {
         const newRecipe = await tsx.recipes.create({
           data: {
@@ -156,92 +74,77 @@ export class RecipeService {
         });
 
         for (let ingredient of ingredients) {
-          const { foodId, name, measures, calories, carbs, proteins, fats } =
-            ingredient;
+          const { foodId, name, measures, unit, calories, carbs, proteins, fats } = ingredient;
 
-          const existingIngredient =
-            await this.ingredientsService.getIngredient(foodId);
+          const existentIngredient = await this.ingredientsService.getIngredient(foodId);
 
-          let ingredientId;
+          let ingredientId: number;
 
-          if (existingIngredient) {
-            ingredientId = existingIngredient.id;
+          if (existentIngredient) {
+            ingredientId = existentIngredient.id;
           } else {
-            const payload = { foodId, name };
-            const newIngredient =
-              await this.ingredientsService.addIngredient(payload);
+            const payload = {
+              foodId,
+              name,
+            };
+
+            const newIngredient = await this.ingredientsService.addIngredient(payload);
+
             ingredientId = newIngredient.id;
           }
 
-          await tsx.recipes_ingredients.create({
-            data: { recipeId: newRecipe.id, ingredientId },
-          });
-
           for (let measure of measures) {
-            const { uri, label, weight } = measure;
+            const { uri, label } = measure;
 
-            let measureId;
+            const payload = {
+              uri,
+              label,
+            };
 
-            const payload = { uri, label };
-            const existingMeasure = await this.unitsService.getUnit(payload);
+            const exitingMeasure = await this.unitsService.getUnit(payload);
 
-            if (existingMeasure) {
-              measureId = existingMeasure.id;
+            if (exitingMeasure) {
             } else {
-              const newMeasure = await this.unitsService.addUnit(payload);
-              measureId = newMeasure.id;
-            }
-
-            const existentIngredientUnit = await tsx.ingredient_units.findFirst(
-              { where: { AND: [{ ingredientId }, { unitId: measureId }] } },
-            );
-
-            if (!existentIngredientUnit) {
-              await tsx.ingredient_units.create({
-                data: {
-                  ingredientId: ingredientId,
-                  unitId: measureId,
-                  weight,
-                },
-              });
+              await this.unitsService.addUnit(payload);
             }
           }
 
-          const currentUnit = await tsx.units.findUnique({
-            where: { label: ingredient.unit },
-          });
-
-          const ingredientUnit = await tsx.ingredient_units.findFirst({
+          const ingredientUnit = await tsx.units.findFirst({
             where: {
-              AND: [{ ingredientId: ingredientId, unitId: currentUnit.id }],
+              label: unit,
             },
           });
 
-          await tsx.ingredient_nutritional_info.create({
+          await tsx.recipes_ingredients.create({
             data: {
-              ingredientUnitId: ingredientUnit.id,
+              recipeId: newRecipe.id,
+              ingredientId,
+              unitId: ingredientUnit.id,
               quantity: ingredient.quantity,
               calories,
-              carbs,
               proteins,
+              carbs,
               fats,
             },
           });
         }
-
         const stepsPayload = steps.map((step) => ({
           recipeId: newRecipe.id,
           step: step.step,
           text: step.text,
         }));
-        await tsx.steps.createMany({ data: stepsPayload });
+        await tsx.steps.createMany({
+          data: stepsPayload,
+        });
         return newRecipe;
       });
     } catch (error) {
       console.log(error);
 
       throw new HttpException(
-        { error: 'Could not create recipe !' },
+        {
+          error: "Could not create recipe !",
+        },
         HttpStatus.CONFLICT,
       );
     }
@@ -257,19 +160,10 @@ export class RecipeService {
   }
 
   async editRecipe(payload: EditRecipeDto) {
-    const { recipe, ingredientsIds, nutritionalInfoIds, stepsIds } = payload;
+    const { recipe, ingredientsIds, stepsIds } = payload;
 
     try {
-      const {
-        id,
-        title,
-        servings,
-        photoUrl,
-        ingredients,
-        steps,
-        type,
-        preparationTime,
-      } = recipe;
+      const { id, title, servings, photoUrl, ingredients, steps, type, preparationTime } = recipe;
 
       return await this.prismaService.$transaction(async (tsx) => {
         await tsx.recipes.update({
@@ -279,61 +173,23 @@ export class RecipeService {
 
         if (ingredientsIds) {
           await tsx.recipes_ingredients.deleteMany({
-            where: {
-              AND: [
-                {
-                  ingredientId: {
-                    in: ingredientsIds,
-                  },
-                },
-                { recipeId: id },
-              ],
-            },
-          });
-        }
-
-        if (nutritionalInfoIds) {
-          await tsx.ingredient_nutritional_info.deleteMany({
-            where: {
-              id: {
-                in: nutritionalInfoIds,
-              },
-            },
+            where: { AND: [{ ingredientId: { in: ingredientsIds } }, { recipeId: id }] },
           });
         }
 
         for (let ingredient of ingredients) {
-          const { calories, carbs, proteins, fats, quantity } = ingredient;
-          let nutritionalInfoId = ingredient.nutritionalInfoId;
+          const { calories, carbs, proteins, fats, quantity, measure } = ingredient;
 
-          const unit = await tsx.units.findFirst({
-            where: { label: ingredient.measure },
-          });
+          const unit = await tsx.units.findFirst({ where: { label: measure } });
 
-          const ingredientUnit = await tsx.ingredient_units.findFirst({
-            where: {
-              AND: [{ ingredientId: ingredient.id }, { unitId: unit.id }],
-            },
-          });
-
-          await tsx.ingredient_nutritional_info.update({
-            where: { id: nutritionalInfoId },
-
-            data: {
-              calories,
-              carbs,
-              proteins,
-              fats,
-              quantity,
-              ingredientUnitId: ingredientUnit.id,
-            },
+          await tsx.recipes_ingredients.updateMany({
+            where: { AND: [{ recipeId: recipe.id }, { ingredientId: ingredient.id }] },
+            data: { calories, carbs, proteins, fats, quantity, unitId: unit.id },
           });
         }
 
         if (stepsIds) {
-          await tsx.steps.deleteMany({
-            where: { AND: [{ id: { in: stepsIds } }, { recipeId: recipe.id }] },
-          });
+          await tsx.steps.deleteMany({ where: { AND: [{ id: { in: stepsIds } }, { recipeId: id }] } });
         }
 
         for (let step of steps) {
@@ -350,93 +206,68 @@ export class RecipeService {
   }
 
   async getRecipe(id) {
-    const recipe = await this.prismaService.recipes.findUnique({
-      where: { id },
-      include: {
-        ingredients: {
-          include: {
-            ingredient: {
-              include: {
-                units: {
-                  include: {
-                    unit: true,
-                    nutritionalInfo: {
-                      select: {
-                        id: true,
-                        quantity: true,
-                        calories: true,
-                        carbs: true,
-                        proteins: true,
-                        fats: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        steps: true,
-      },
-    });
+    try {
+      const recipe = await this.prismaService.$queryRaw`SELECT 
+     r.id,
+     r.title,
+     r.servings,
+     r."photo_url" AS "photoUrl",
+     r.type,
+     r."preparation_time" AS "preparationTime",
+     CAST(ROUND(SUM(ri.calories::numeric), 2) AS float8) AS "totalCalories",
+    (
+        SELECT json_agg(
+          json_build_object(
+            'id', i.id,
+            'foodId', i."food_id", 
+            'name', i.name,
+            'quantity', ri.quantity,
+            'unitId', u.id,
+            'unit', u.label,
+            'calories', CAST(ROUND(ri.calories::numeric, 2) AS float8),
+            'carbs', CAST(ROUND(ri.carbs::numeric, 2) AS float8),
+            'fats', CAST(ROUND(ri.fats::numeric, 2) AS float8),
+            'proteins', CAST(ROUND(ri.proteins::numeric, 2) AS float8)
+          )
+        )
+        FROM recipes_ingredients ri
+        LEFT JOIN ingredients i ON ri."ingredient_id" = i.id
+        LEFT JOIN units u ON ri."unit_id" = u.id
+        WHERE ri."recipe_id" = r.id
+      ) AS ingredients,
+    
+    (
+        SELECT json_agg(
+          json_build_object(
+            'id', s.id,
+            'step', s.step,
+            'text', s.text
+          )
+        )
+        FROM steps s
+        WHERE s."recipe_id" = r.id
+      ) AS steps
+     
+     
+   FROM 
+     recipes r
+   LEFT JOIN 
+     recipes_ingredients ri ON r.id = ri."recipe_id"
+   LEFT JOIN 
+     ingredients i ON ri."ingredient_id" = i.id
+   LEFT JOIN 
+     units u ON ri."unit_id" = u.id
+   LEFT JOIN
+     steps s ON s."recipe_id" = r.id
+   WHERE 
+     r.id = ${id} 
+   GROUP BY 
+     r.id;`;
 
-    if (!recipe) {
-      throw new HttpException(
-        { error: 'Recipe not found !' },
-        HttpStatus.NOT_FOUND,
-      );
+      return recipe[0];
+    } catch (error) {
+      console.log(error);
+      throw new HttpException({ error }, HttpStatus.CONFLICT);
     }
-
-    const formattedRecipe = {
-      id: recipe.id,
-      userId: recipe.userId,
-      title: recipe.title,
-      servings: recipe.servings,
-      photoUrl: recipe.photoUrl,
-      preparationTime: recipe.preparationTime,
-      type: recipe.type,
-      ingredients: recipe.ingredients.map((recipeIngredient) => {
-        const ingredient = recipeIngredient.ingredient;
-
-        const primaryUnitInfo = ingredient.units.find(
-          (unit) => unit.nutritionalInfo.length > 0,
-        );
-
-        const nutritionalInfo = ingredient.units
-          .flatMap((unit) => unit.nutritionalInfo)
-          .filter((info) => info.quantity !== undefined);
-
-        const allUnits = ingredient.units.map((unit) => ({
-          label: unit.unit.label,
-          uri: unit.unit.uri,
-        }));
-
-        return {
-          id: ingredient.id,
-          foodId: ingredient.foodId,
-          name: ingredient.name,
-          unit: primaryUnitInfo?.unit.label || null,
-          allUnits,
-
-          nutritionalInfoId: nutritionalInfo[0].id,
-          quantity: nutritionalInfo[0]?.quantity || null,
-          calories: nutritionalInfo[0]?.calories
-            ? nutritionalInfo[0]?.calories.toNumber()
-            : null,
-          carbs: nutritionalInfo[0]?.carbs
-            ? nutritionalInfo[0].carbs.toNumber()
-            : null,
-          proteins: nutritionalInfo[0]?.proteins
-            ? nutritionalInfo[0]?.proteins.toNumber()
-            : null,
-          fats: nutritionalInfo[0]?.fats
-            ? nutritionalInfo[0]?.fats.toNumber()
-            : null,
-        };
-      }),
-      steps: recipe.steps,
-    };
-
-    return formattedRecipe;
   }
 }
