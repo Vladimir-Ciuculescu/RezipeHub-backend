@@ -3,8 +3,6 @@ import { CreateRecipeDto, EditRecipeDto, EditRecipePhotoDto, RecipesDto, Recipes
 import { PrismaService } from "prisma.service";
 import { IngredientsService } from "src/ingredients/ingredients.service";
 import { UnitsService } from "src/units/units.service";
-import { recipes_ingredients } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class RecipeService {
@@ -14,24 +12,72 @@ export class RecipeService {
     private readonly unitsService: UnitsService,
   ) {}
 
-  //TODO : Adjust the query so that it filters number of calories too
   async getRecipes(query: RecipesDto) {
-    const { title, categories, caloriesRange, preparationTimeRange } = query;
+    const { title, categories, caloriesRange, preparationTimeRange, page, limit } = query;
 
-    const recipes = await this.prismaService.$queryRaw`SELECT 
-    r.id AS recipe_id,
-    r.title AS recipe_title,
-    SUM(ri.calories) AS total_calories
-  FROM 
-    recipes r
-  JOIN 
-    recipes_ingredients ri ON r.id = ri.recipe_id
-  GROUP BY 
-    r.id, r.title
-  HAVING 
-    SUM(ri.calories) BETWEEN ${caloriesRange[0]} AND ${caloriesRange[1]}
-  ORDER BY 
-    total_calories;`;
+    const baseQuery = `
+      SELECT 
+        r.id,
+        r.title AS title,
+        r.photo_url AS "photoUrl",
+        r."preparation_time" AS "preparationTime",
+        CAST(ROUND(SUM(ri.calories::numeric), 2) AS float8) AS "totalCalories",
+        json_build_object(
+          'id', u.id,
+          'firstName', u.first_name,
+          'lastName', u.last_name,
+          'photoUrl', u.photo_url
+        ) AS user
+      FROM 
+        recipes r
+      JOIN 
+        recipes_ingredients ri ON r.id = ri.recipe_id
+      JOIN
+        users u ON r.user_id = u.id
+    `;
+
+    // Create an array to hold the conditions
+    const conditions: string[] = [];
+    const havingConditions: string[] = [];
+
+    // Add conditions for title
+    if (title) {
+      conditions.push(`r.title ILIKE '%' || '${title}' || '%'`); // ILIKE for case-insensitive search
+    }
+
+    // Add conditions for categories if needed (assuming categories is an array of category IDs)
+    if (categories && categories.length > 0) {
+      const formattedCategories = categories.map((category) => `'${category}'`).join(", ");
+      conditions.push(`r.type IN (${formattedCategories})`);
+    }
+
+    // Add HAVING condition for calories range
+    if (caloriesRange && caloriesRange.length === 2) {
+      havingConditions.push(`SUM(ri.calories) BETWEEN ${caloriesRange[0]} AND ${caloriesRange[1]}`);
+    }
+
+    // Add WHERE condition for preparation time range
+    if (preparationTimeRange && preparationTimeRange.length === 2) {
+      conditions.push(`r."preparation_time" BETWEEN ${preparationTimeRange[0]} AND ${preparationTimeRange[1]}`);
+    }
+
+    // Construct the final SQL query
+    const finalQuery = `
+      ${baseQuery}
+      WHERE ${conditions.length > 0 ? conditions.join(" AND ") : "TRUE"}
+      GROUP BY 
+        r.id, r.title, u.id, u.first_name, u.last_name, u.photo_url
+      HAVING ${havingConditions.length > 0 ? havingConditions.join(" AND ") : "TRUE"}
+      ORDER BY r.updated_at
+      LIMIT ${limit}
+      OFFSET ${limit * page}
+      ;
+    `;
+
+    console.log(3, finalQuery);
+
+    // Execute the final query
+    const recipes = await this.prismaService.$queryRawUnsafe(finalQuery);
 
     return recipes;
   }

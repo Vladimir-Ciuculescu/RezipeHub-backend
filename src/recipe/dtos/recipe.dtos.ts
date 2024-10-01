@@ -94,14 +94,6 @@ export class EditRecipePhotoDto {
 }
 
 export class RecipesDto {
-  @IsNumber()
-  @Transform(({ obj }) => parseInt(obj.page))
-  page: number;
-
-  @IsNumber()
-  @Transform(({ obj }) => parseInt(obj.limit))
-  limit: number;
-
   @IsOptional()
   @IsString()
   title: string;
@@ -122,7 +114,16 @@ export class RecipesDto {
   @IsArray()
   @ArrayMinSize(2)
   @IsNumber({}, { each: true })
+  @Transform(({ value }) => (Array.isArray(value) ? value.map(Number) : []))
   preparationTimeRange: [min: number, max: number];
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.page))
+  page: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.limit))
+  limit: number;
 }
 
 export class RecipesPerUserDto {

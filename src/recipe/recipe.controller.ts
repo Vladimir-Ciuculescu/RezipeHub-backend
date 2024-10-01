@@ -15,7 +15,7 @@ import { SerializeInterceptor } from "src/interceptors/serialize.interceptor";
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Get("/")
   getRecipes(@Query() query: RecipesDto) {
