@@ -11,6 +11,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { S3Module } from './s3/s3.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { UnitsModule } from './units/units.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UnitsModule } from './units/units.module';
     IngredientsModule,
     S3Module,
     UnitsModule,
+    FavoritesModule,
   ],
   providers: [S3Service, S3Client],
 })

@@ -74,8 +74,6 @@ export class RecipeService {
       ;
     `;
 
-    console.log(3, finalQuery);
-
     // Execute the final query
     const recipes = await this.prismaService.$queryRawUnsafe(finalQuery);
 

@@ -18,20 +18,21 @@ enum token_type {
 }
 
 model users {
-  id             Int            @id @default(autoincrement())
-  email          String         @unique
-  username       String?        @unique
-  firstName      String         @map("first_name")
-  lastName       String         @map("last_name")
-  password       String?
-  photoUrl       String?        @map("photo_url")
-  isVerified     Boolean        @default(false) @map("is_verified")
-  refreshToken   String?        @map("refresh_token") @db.VarChar(256)
-  tokens         tokens[]
-  socialProvider auth_methods[]
-  recipes        recipes[]
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedtAt     DateTime       @default(now()) @map("updated_at")
+  id              Int               @id @default(autoincrement())
+  email           String            @unique
+  username        String?           @unique
+  firstName       String            @map("first_name")
+  lastName        String            @map("last_name")
+  password        String?
+  photoUrl        String?           @map("photo_url")
+  isVerified      Boolean           @default(false) @map("is_verified")
+  refreshToken    String?           @map("refresh_token") @db.VarChar(256)
+  tokens          tokens[]
+  socialProvider  auth_methods[]
+  recipes         recipes[]
+  users_favorites users_favorites[]
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedtAt      DateTime          @default(now()) @map("updated_at")
 }
 
 model auth_methods {
@@ -64,6 +65,7 @@ model recipes {
   type            String
   preparationTime Int                   @map("preparation_time")
   ingredients     recipes_ingredients[]
+  user_favoritess users_favorites[]
   steps           steps[]
   createdAt       DateTime              @default(now()) @map("created_at")
   updatedAt       DateTime              @default(now()) @map("updated_at")
@@ -99,6 +101,16 @@ model recipes_ingredients {
   carbs        Decimal?    @db.Decimal(10, 2)
   proteins     Decimal?    @db.Decimal(10, 2)
   fats         Decimal?    @db.Decimal(10, 2)
+}
+
+model users_favorites {
+  id       Int     @id @default(autoincrement())
+  recipe   recipes @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId Int     @map("recipe_id")
+  user     users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   Int     @map("user_id")
+
+  @@unique([recipeId, userId])
 }
 
 model steps {
