@@ -94,6 +94,10 @@ export class EditRecipePhotoDto {
 }
 
 export class RecipesDto {
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.userId))
+  userId: number;
+
   @IsOptional()
   @IsString()
   title: string;

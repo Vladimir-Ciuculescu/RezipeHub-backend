@@ -13,7 +13,7 @@ export class RecipeService {
   ) {}
 
   async getRecipes(query: RecipesDto) {
-    const { title, categories, caloriesRange, preparationTimeRange, page, limit } = query;
+    const { title, categories, caloriesRange, preparationTimeRange, page, limit, userId } = query;
 
     const baseQuery = `
       SELECT 
@@ -65,6 +65,7 @@ export class RecipeService {
     const finalQuery = `
       ${baseQuery}
       WHERE ${conditions.length > 0 ? conditions.join(" AND ") : "TRUE"}
+      AND r.user_id != ${userId}
       GROUP BY 
         r.id, r.title, u.id, u.first_name, u.last_name, u.photo_url
       HAVING ${havingConditions.length > 0 ? havingConditions.join(" AND ") : "TRUE"}
