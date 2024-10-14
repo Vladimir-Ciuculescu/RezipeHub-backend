@@ -1,10 +1,48 @@
 import { BadGatewayException, Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma.service";
-import { IsFavoriteDto } from "./favorites.dto";
+import { GetFavoritesDto, IsFavoriteDto } from "./favorites.dto";
 
 @Injectable()
 export class FavoritesService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async getFavorites(query: GetFavoritesDto) {
+    const { limit, page, userId } = query;
+
+    try {
+      const favorites = await this.prismaService.users_favorites.findMany({
+        where: {
+          userId,
+        },
+
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          recipe: true,
+          user: true,
+        },
+        skip: limit * page,
+        take: limit,
+      });
+
+      const formattedFavorites = favorites.map((favorite) => ({
+        id: favorite.recipe.id,
+        title: favorite.recipe.title,
+        photoUrl: favorite.recipe.photoUrl,
+        user: {
+          id: favorite.user.id,
+          firstName: favorite.user.firstName,
+          lastName: favorite.user.lastName,
+          photoUrl: favorite.user.photoUrl,
+        },
+      }));
+
+      return formattedFavorites;
+    } catch (error) {
+      throw new BadGatewayException();
+    }
+  }
 
   async getIsInFavorites(body: IsFavoriteDto) {
     const { userId, recipeId } = body;

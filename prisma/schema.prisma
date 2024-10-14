@@ -65,7 +65,7 @@ model recipes {
   type            String
   preparationTime Int                   @map("preparation_time")
   ingredients     recipes_ingredients[]
-  user_favoritess users_favorites[]
+  user_favorites  users_favorites[]
   steps           steps[]
   createdAt       DateTime              @default(now()) @map("created_at")
   updatedAt       DateTime              @default(now()) @map("updated_at")
@@ -104,11 +104,12 @@ model recipes_ingredients {
 }
 
 model users_favorites {
-  id       Int     @id @default(autoincrement())
-  recipe   recipes @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  recipeId Int     @map("recipe_id")
-  user     users   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   Int     @map("user_id")
+  id        Int      @id @default(autoincrement())
+  recipe    recipes  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId  Int      @map("recipe_id")
+  user      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([recipeId, userId])
 }

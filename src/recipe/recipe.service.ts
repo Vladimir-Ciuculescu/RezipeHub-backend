@@ -69,7 +69,7 @@ export class RecipeService {
       GROUP BY 
         r.id, r.title, u.id, u.first_name, u.last_name, u.photo_url
       HAVING ${havingConditions.length > 0 ? havingConditions.join(" AND ") : "TRUE"}
-      ORDER BY r.updated_at
+      ORDER BY r.updated_at DESC
       LIMIT ${limit}
       OFFSET ${limit * page}
       ;
@@ -91,7 +91,8 @@ export class RecipeService {
       JOIN recipes_ingredients ri ON r.id = ri."recipe_id"
       WHERE r."user_id" = ${userId}
       GROUP BY r.id, r.title, r.servings, r.type, r."preparation_time" 
-      ORDER BY r."created_at" DESC
+      -- ORDER BY r."created_at" DESC
+      ORDER BY r."created_at" ASC
       OFFSET ${page * limit} ROWS 
       FETCH NEXT ${limit} ROWS only;`;
 

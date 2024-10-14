@@ -1,11 +1,19 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Query, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FavoritesService } from "./favorites.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
-import { IsFavoriteDto } from "./favorites.dto";
+import { GetFavoritesDto, IsFavoriteDto } from "./favorites.dto";
+import { SerializeInterceptor } from "src/interceptors/serialize.interceptor";
 
 @Controller("favorites")
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Get("/")
+  getFavorites(@Query() query: GetFavoritesDto) {
+    return this.favoritesService.getFavorites(query);
+  }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
