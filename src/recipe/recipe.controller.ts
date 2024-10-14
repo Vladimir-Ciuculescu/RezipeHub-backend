@@ -4,6 +4,7 @@ import {
   CreateRecipeDto,
   EditRecipeDto,
   EditRecipePhotoDto,
+  LatestRecipesDto,
   RecipeBriefInfoDto,
   RecipesDto,
   RecipesPerUserDto,
@@ -20,6 +21,13 @@ export class RecipeController {
   @Get("/")
   getRecipes(@Query() query: RecipesDto) {
     return this.recipeService.getRecipes(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Get("/latest")
+  getLatestRecipes(@Query() query: LatestRecipesDto) {
+    return this.recipeService.getLatestRecipes(query);
   }
 
   @UseGuards(JwtAuthGuard)

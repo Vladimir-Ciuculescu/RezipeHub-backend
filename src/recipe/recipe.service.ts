@@ -1,5 +1,12 @@
 import { BadGatewayException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { CreateRecipeDto, EditRecipeDto, EditRecipePhotoDto, RecipesDto, RecipesPerUserDto } from "./dtos/recipe.dtos";
+import {
+  CreateRecipeDto,
+  EditRecipeDto,
+  EditRecipePhotoDto,
+  LatestRecipesDto,
+  RecipesDto,
+  RecipesPerUserDto,
+} from "./dtos/recipe.dtos";
 import { PrismaService } from "prisma.service";
 import { IngredientsService } from "src/ingredients/ingredients.service";
 import { UnitsService } from "src/units/units.service";
@@ -11,6 +18,56 @@ export class RecipeService {
     private readonly ingredientsService: IngredientsService,
     private readonly unitsService: UnitsService,
   ) {}
+
+  async getLatestRecipes(query: LatestRecipesDto) {
+    const { userId, page, limit } = query;
+
+    try {
+      const latestRecipes = await this.prismaService.recipes.findMany({
+        where: {
+          userId: {
+            not: userId, // Exclude recipes created by the current user
+          },
+        },
+
+        select: {
+          id: true,
+          title: true,
+          photoUrl: true,
+          preparationTime: true,
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              photoUrl: true,
+            },
+          },
+          user_favorites: {
+            where: {
+              userId: query.userId,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc", // Order by creation date, descending
+        },
+        skip: limit * page,
+        take: limit,
+      });
+
+      const transformedRecipes = latestRecipes.map((recipe) => {
+        const { user_favorites, ...rest } = recipe;
+
+        return {
+          ...rest,
+          isInFavorites: recipe.user_favorites.length > 0,
+        };
+      });
+
+      return transformedRecipes;
+    } catch (error) {}
+  }
 
   async getRecipes(query: RecipesDto) {
     const { title, categories, caloriesRange, preparationTimeRange, page, limit, userId } = query;
@@ -69,7 +126,7 @@ export class RecipeService {
       GROUP BY 
         r.id, r.title, u.id, u.first_name, u.last_name, u.photo_url
       HAVING ${havingConditions.length > 0 ? havingConditions.join(" AND ") : "TRUE"}
-      ORDER BY r.updated_at DESC
+      ORDER BY r.created_at DESC
       LIMIT ${limit}
       OFFSET ${limit * page}
       ;

@@ -130,6 +130,20 @@ export class RecipesDto {
   limit: number;
 }
 
+export class LatestRecipesDto {
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.userId))
+  userId: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.page))
+  page: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.limit))
+  limit: number;
+}
+
 export class RecipesPerUserDto {
   @IsNumber()
   @Transform(({ obj }) => parseInt(obj.page))
