@@ -5,6 +5,7 @@ import {
   EditRecipeDto,
   EditRecipePhotoDto,
   LatestRecipesDto,
+  MostPopularRecipesDto,
   RecipeBriefInfoDto,
   RecipesDto,
   RecipesPerUserDto,
@@ -28,6 +29,13 @@ export class RecipeController {
   @Get("/latest")
   getLatestRecipes(@Query() query: LatestRecipesDto) {
     return this.recipeService.getLatestRecipes(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Get("/most-popular")
+  getMostPopularRecipes(@Query() query: MostPopularRecipesDto) {
+    return this.recipeService.getMostPopularRecipes(query);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -65,5 +73,12 @@ export class RecipeController {
   @Get("/:id")
   getRecipe(@Param("id") id: string) {
     return this.recipeService.getRecipe(parseInt(id));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Put("/:id/view")
+  updateViewCount(@Param("id") id: string) {
+    return this.recipeService.updateViewCount(parseInt(id));
   }
 }

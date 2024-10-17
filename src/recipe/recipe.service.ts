@@ -4,6 +4,7 @@ import {
   EditRecipeDto,
   EditRecipePhotoDto,
   LatestRecipesDto,
+  MostPopularRecipesDto,
   RecipesDto,
   RecipesPerUserDto,
 } from "./dtos/recipe.dtos";
@@ -52,6 +53,7 @@ export class RecipeService {
         orderBy: {
           createdAt: "desc", // Order by creation date, descending
         },
+
         skip: limit * page,
         take: limit,
       });
@@ -66,7 +68,57 @@ export class RecipeService {
       });
 
       return transformedRecipes;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      throw new BadGatewayException();
+    }
+  }
+
+  async getMostPopularRecipes(query: MostPopularRecipesDto) {
+    const { userId, page, limit } = query;
+
+    try {
+      const mostPopularRecipes = await this.prismaService.recipes.findMany({
+        where: {
+          userId: {
+            not: userId,
+          },
+        },
+
+        select: {
+          id: true,
+          title: true,
+          photoUrl: true,
+          preparationTime: true,
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              photoUrl: true,
+            },
+          },
+          user_favorites: {
+            where: {
+              userId: query.userId,
+            },
+          },
+        },
+        orderBy: [
+          {
+            user_favorites: { _count: "desc" },
+          },
+          { viewCount: "desc" },
+        ],
+        skip: limit * page,
+        take: limit,
+      });
+
+      return mostPopularRecipes;
+    } catch (error) {
+      console.log(error);
+      throw new BadGatewayException();
+    }
   }
 
   async getRecipes(query: RecipesDto) {
@@ -156,7 +208,6 @@ export class RecipeService {
       return recipes;
     } catch (error) {
       console.log(error);
-
       throw new BadGatewayException();
     }
   }
@@ -371,6 +422,28 @@ export class RecipeService {
     } catch (error) {
       console.log(error);
       throw new HttpException({ error }, HttpStatus.CONFLICT);
+    }
+  }
+
+  async updateViewCount(id: number) {
+    try {
+      await this.prismaService.recipes.update({
+        where: {
+          id,
+        },
+        data: {
+          viewCount: {
+            increment: 1,
+          },
+        },
+      });
+
+      return {
+        message: "View count updated !",
+      };
+    } catch (error) {
+      console.log(error);
+      throw new BadGatewayException();
     }
   }
 }

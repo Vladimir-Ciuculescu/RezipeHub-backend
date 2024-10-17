@@ -64,6 +64,7 @@ model recipes {
   photoUrl        String?               @map("photo_url")
   type            String
   preparationTime Int                   @map("preparation_time")
+  viewCount       Int                   @default(0) @map("view_count")
   ingredients     recipes_ingredients[]
   user_favorites  users_favorites[]
   steps           steps[]
