@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsString } from 'class-validator';
+import { IsEmail, IsNumber, IsString } from "class-validator";
 
 export class UserRequestDto {
   @IsNumber()
@@ -12,4 +12,7 @@ export class UserRequestDto {
 
   @IsString()
   lastName: string;
+
+  @IsString()
+  photoUrl: string;
 }

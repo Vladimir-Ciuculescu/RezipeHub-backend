@@ -1,10 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
-import { DeleteImageRecipeFromS3Dto } from './s3.dtos';
+import { Injectable } from "@nestjs/common";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteImageRecipeFromS3Dto } from "./s3.dtos";
 
 @Injectable()
 export class S3Service {
@@ -21,12 +17,7 @@ export class S3Service {
     });
   }
 
-  async uploadImage(
-    file: Express.Multer.File,
-    userId: string,
-    id: string,
-    buffer: Buffer,
-  ) {
+  async uploadImage(file: Express.Multer.File, userId: string, id: string, buffer: Buffer) {
     const path = `users/${userId}/recipes/${id}/images`;
 
     try {
@@ -37,7 +28,7 @@ export class S3Service {
           Key: path,
           Body: buffer,
           ContentType: file.mimetype,
-          ACL: 'public-read',
+          ACL: "public-read",
         }),
       );
 
@@ -51,7 +42,7 @@ export class S3Service {
     }
   }
 
-  async removeImage(payload: DeleteImageRecipeFromS3Dto) {
+  async removeRecipeImage(payload: DeleteImageRecipeFromS3Dto) {
     const { recipeId, userId } = payload;
 
     try {

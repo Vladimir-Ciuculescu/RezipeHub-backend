@@ -1,17 +1,14 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
-import { PrismaService } from 'prisma.service';
-import { CreateUserDto } from './dtos/create-user.dto';
-import { hashPassword } from 'src/utils/hashPassword';
-import { EmailService } from 'src/email/email.service';
-import { TokenService } from 'src/token/token.service';
-import { generateToken } from 'src/utils/generateToken';
-import { CreateTokenDto } from 'src/token/dtos/create-token.dto';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
+import { PrismaService } from "prisma.service";
+import { CreateUserDto } from "./dtos/create-user.dto";
+import { hashPassword } from "src/utils/hashPassword";
+import { EmailService } from "src/email/email.service";
+import { TokenService } from "src/token/token.service";
+import { generateToken } from "src/utils/generateToken";
+import { CreateTokenDto } from "src/token/dtos/create-token.dto";
+import { EditProfileDto, GetProfileDto } from "./users.dto";
+import { AuthService } from "src/auth/auth.service";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class UsersService {
@@ -20,6 +17,9 @@ export class UsersService {
     private readonly emailService: EmailService,
     @Inject(forwardRef(() => TokenService))
     private readonly tokenService: TokenService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async findUser(email: string) {
@@ -43,11 +43,11 @@ export class UsersService {
 
     if (existentUser) {
       if (existentUser.email === email) {
-        errors.email = 'Email already in use';
+        errors.email = "Email already in use";
       }
 
       if (existentUser.username === username) {
-        errors.username = 'Username already in use';
+        errors.username = "Username already in use";
       }
 
       throw new HttpException(errors, HttpStatus.CONFLICT);
@@ -109,5 +109,36 @@ Yumhub`,
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async getProfile(payload: GetProfileDto) {
+    const { id } = payload;
+
+    try {
+      const data = await this.prismaService.users.findFirst({
+        where: { id },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          photoUrl: true,
+        },
+      });
+
+      const accessToken = await this.jwtService.signAsync(data, {
+        secret: process.env.JWT_SECRET_KEY,
+        expiresIn: "10m",
+      });
+
+      return accessToken;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException({ error }, HttpStatus.CONFLICT);
+    }
+  }
+
+  async updateProfile(payload: EditProfileDto) {
+    return payload;
   }
 }
