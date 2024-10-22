@@ -2,7 +2,6 @@ import { Body, Controller, Get, HttpCode, Post, Query, UseGuards, UseInterceptor
 import { FavoritesService } from "./favorites.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { GetFavoritesDto, IsFavoriteDto } from "./favorites.dto";
-import { SerializeInterceptor } from "src/interceptors/serialize.interceptor";
 
 @Controller("favorites")
 export class FavoritesController {

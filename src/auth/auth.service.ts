@@ -6,17 +6,17 @@ import {
   Injectable,
   NotFoundException,
   forwardRef,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/public/users/dtos/create-user.dto';
-import { UsersService } from 'src/public/users/users.service';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from 'prisma.service';
-import { UserRequestDto } from 'src/public/users/dtos/user-request.dto';
-import { SocialUserRequestDto } from 'src/public/users/dtos/social-user-request.dto';
-import { ResetPasswordRequestDto } from 'src/public/users/dtos/reset-password-request.dto';
-import { TokenType } from 'types/enums';
-import { hashPassword } from 'src/utils/hashPassword';
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
+import { UsersService } from "src/public/users/users.service";
+import * as bcrypt from "bcrypt";
+import { PrismaService } from "prisma.service";
+import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
+import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
+import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
+import { TokenType } from "types/enums";
+import { hashPassword } from "src/utils/hashPassword";
 
 @Injectable()
 export class AuthService {
@@ -45,10 +45,12 @@ export class AuthService {
 
   async login(user: UserRequestDto) {
     const payload = {
-      email: user.email,
       id: user.id,
+      email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      photoUrl: user.photoUrl,
+      bio: user.bio,
     };
 
     const { accessToken, refreshToken } = await this.generateTokens(payload);
@@ -76,10 +78,9 @@ export class AuthService {
     //! : Possible need to change findFirst method
     if (existentUser) {
       userId = existentUser.id;
-      const existentAuthMethod =
-        await this.prismaService.auth_methods.findFirst({
-          where: { AND: [{ userId: existentUser.id }, { provider: provider }] },
-        });
+      const existentAuthMethod = await this.prismaService.auth_methods.findFirst({
+        where: { AND: [{ userId: existentUser.id }, { provider: provider }] },
+      });
 
       if (existentAuthMethod) {
         await this.prismaService.auth_methods.updateMany({
@@ -96,13 +97,14 @@ export class AuthService {
         });
       }
 
-      const { id, email, firstName, lastName } = existentUser;
+      const { id, email, firstName, lastName, photoUrl } = existentUser;
 
       payload = {
-        email: email,
-        id: id,
-        firstName: firstName,
-        lastName: lastName,
+        id,
+        email,
+        firstName,
+        lastName,
+        photoUrl,
       };
     } else {
       const newUser = await this.prismaService.users.create({
@@ -120,10 +122,12 @@ export class AuthService {
       });
 
       payload = {
-        email: newUser.email,
         id: newUser.id,
+        email: newUser.email,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
+        photoUrl: newUser.photoUrl,
+        bio: newUser.bio,
       };
     }
     const { accessToken, refreshToken } = await this.generateTokens(payload);
@@ -145,10 +149,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new HttpException(
-        { error: 'User not found !' },
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException({ error: "User not found !" }, HttpStatus.NOT_FOUND);
     }
 
     const storedToken = await this.prismaService.tokens.findFirst({
@@ -157,15 +158,8 @@ export class AuthService {
 
     const now = new Date();
 
-    if (
-      !storedToken ||
-      storedToken.token !== token ||
-      storedToken.expiresAt < now
-    ) {
-      throw new HttpException(
-        { error: 'Token not valid or expired' },
-        HttpStatus.NOT_FOUND,
-      );
+    if (!storedToken || storedToken.token !== token || storedToken.expiresAt < now) {
+      throw new HttpException({ error: "Token not valid or expired" }, HttpStatus.NOT_FOUND);
     }
 
     const hashedPassword = await hashPassword(password);
@@ -193,10 +187,7 @@ export class AuthService {
       throw new BadGatewayException();
     }
 
-    const isMatchRefreshToken = await bcrypt.compare(
-      oldRefreshToken,
-      user.refreshToken,
-    );
+    const isMatchRefreshToken = await bcrypt.compare(oldRefreshToken, user.refreshToken);
 
     if (!isMatchRefreshToken) {
       //throw new
@@ -208,6 +199,8 @@ export class AuthService {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
+      photoUrl: data.photoUrl,
+      bio: data.bio,
     };
 
     const { accessToken, refreshToken } = await this.generateTokens(payload);
@@ -225,8 +218,8 @@ export class AuthService {
 
   async generateTokens(payload) {
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.sign(payload, { expiresIn: '10m' }),
-      this.jwtService.sign(payload, { expiresIn: '30d' }),
+      this.jwtService.sign(payload, { expiresIn: "10m" }),
+      this.jwtService.sign(payload, { expiresIn: "30d" }),
     ]);
 
     return { accessToken, refreshToken };

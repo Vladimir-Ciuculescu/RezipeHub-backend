@@ -25,6 +25,7 @@ model users {
   lastName        String            @map("last_name")
   password        String?
   photoUrl        String?           @map("photo_url")
+  bio             String?
   isVerified      Boolean           @default(false) @map("is_verified")
   refreshToken    String?           @map("refresh_token") @db.VarChar(256)
   tokens          tokens[]
