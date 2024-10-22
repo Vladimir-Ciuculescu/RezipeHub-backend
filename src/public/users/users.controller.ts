@@ -1,7 +1,9 @@
-import { Body, Controller, Get, HttpCode, Put, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { EditProfileDto, GetProfileDto } from "./users.dto";
 import { UsersService } from "./users.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
 
 @Controller("users")
 export class UsersController {
@@ -17,7 +19,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Put("/update-profile")
   @HttpCode(202)
-  updateProfile(payload: EditProfileDto) {
-    return this.usersService.updateProfile(payload);
+  @UseInterceptors(FileInterceptor("file"))
+  uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body: EditProfileDto) {
+    return this.usersService.updateProfile(file, body);
   }
 }

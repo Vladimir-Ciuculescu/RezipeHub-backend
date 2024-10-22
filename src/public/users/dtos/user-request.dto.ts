@@ -15,4 +15,7 @@ export class UserRequestDto {
 
   @IsString()
   photoUrl: string;
+
+  @IsString()
+  bio: string;
 }

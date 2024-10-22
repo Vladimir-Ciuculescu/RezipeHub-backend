@@ -50,6 +50,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       photoUrl: user.photoUrl,
+      bio: user.bio,
     };
 
     const { accessToken, refreshToken } = await this.generateTokens(payload);
@@ -126,6 +127,7 @@ export class AuthService {
         firstName: newUser.firstName,
         lastName: newUser.lastName,
         photoUrl: newUser.photoUrl,
+        bio: newUser.bio,
       };
     }
     const { accessToken, refreshToken } = await this.generateTokens(payload);
@@ -197,6 +199,8 @@ export class AuthService {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
+      photoUrl: data.photoUrl,
+      bio: data.bio,
     };
 
     const { accessToken, refreshToken } = await this.generateTokens(payload);

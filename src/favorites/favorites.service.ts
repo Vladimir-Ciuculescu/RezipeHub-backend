@@ -40,6 +40,7 @@ export class FavoritesService {
 
       return formattedFavorites;
     } catch (error) {
+      console.log(error);
       throw new BadGatewayException();
     }
   }

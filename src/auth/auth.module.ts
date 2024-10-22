@@ -10,6 +10,8 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { RefreshJwtStrategy } from "./strategies/refresh-jwt.strategy";
 import { EmailService } from "src/email/email.service";
 import { TokenService } from "src/token/token.service";
+import { S3Service } from "src/s3/s3.service";
+import { S3Client } from "@aws-sdk/client-s3";
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { TokenService } from "src/token/token.service";
     JwtStrategy,
     RefreshJwtStrategy,
     UsersService,
+    S3Service,
+    S3Client,
   ],
 })
 export class AuthModule {}

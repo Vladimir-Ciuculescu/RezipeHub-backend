@@ -200,8 +200,7 @@ export class RecipeService {
       JOIN recipes_ingredients ri ON r.id = ri."recipe_id"
       WHERE r."user_id" = ${userId}
       GROUP BY r.id, r.title, r.servings, r.type, r."preparation_time" 
-      -- ORDER BY r."created_at" DESC
-      ORDER BY r."created_at" ASC
+      ORDER BY r."created_at" DESC
       OFFSET ${page * limit} ROWS 
       FETCH NEXT ${limit} ROWS only;`;
 

@@ -13,7 +13,8 @@ export class S3Controller {
   @Post("/upload-image")
   @UseInterceptors(FileInterceptor("file"))
   uploadImage(@UploadedFile() file: Express.Multer.File, @Body("userId") userId: string, @Body("id") id: string) {
-    return this.s3Service.uploadImage(file, userId, id, file.buffer);
+    const path = `users/${userId}/recipes/${id}/images`;
+    return this.s3Service.uploadImage(file, file.buffer, path);
   }
 
   @UseGuards(JwtAuthGuard)

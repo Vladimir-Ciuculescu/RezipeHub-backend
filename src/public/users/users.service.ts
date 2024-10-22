@@ -7,8 +7,8 @@ import { TokenService } from "src/token/token.service";
 import { generateToken } from "src/utils/generateToken";
 import { CreateTokenDto } from "src/token/dtos/create-token.dto";
 import { EditProfileDto, GetProfileDto } from "./users.dto";
-import { AuthService } from "src/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
+import { S3Service } from "src/s3/s3.service";
 
 @Injectable()
 export class UsersService {
@@ -17,9 +17,8 @@ export class UsersService {
     private readonly emailService: EmailService,
     @Inject(forwardRef(() => TokenService))
     private readonly tokenService: TokenService,
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
     private readonly jwtService: JwtService,
+    private readonly s3Service: S3Service,
   ) {}
 
   async findUser(email: string) {
@@ -123,6 +122,7 @@ Yumhub`,
           lastName: true,
           email: true,
           photoUrl: true,
+          bio: true,
         },
       });
 
@@ -138,7 +138,44 @@ Yumhub`,
     }
   }
 
-  async updateProfile(payload: EditProfileDto) {
-    return payload;
+  async updateProfile(file: Express.Multer.File, body: EditProfileDto) {
+    const { id, firstName, lastName, email, bio } = body;
+
+    let photoUrl = null;
+
+    try {
+      if (!file) {
+        await this.s3Service.removeProfileImage({ userId: id });
+      } else {
+        const path = `users/${id}/profile`;
+        const { url } = await this.s3Service.uploadImage(file, file.buffer, path);
+
+        photoUrl = url;
+      }
+
+      const updatedUser = await this.prismaService.users.update({
+        where: { id },
+        data: { firstName, lastName, email, photoUrl, bio },
+      });
+
+      const payload = {
+        id: updatedUser.id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        photoUrl: updatedUser.photoUrl,
+        bio: updatedUser.bio,
+      };
+
+      const accessToken = await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET_KEY,
+        expiresIn: "10m",
+      });
+
+      return accessToken;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException({ error: "Error during updating profile" }, HttpStatus.BAD_GATEWAY);
+    }
   }
 }

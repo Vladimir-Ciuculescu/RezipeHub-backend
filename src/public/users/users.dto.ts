@@ -8,6 +8,10 @@ export class GetProfileDto {
 }
 
 export class EditProfileDto {
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.id))
+  id: number;
+
   @IsOptional()
   @IsString()
   firstName: string;
