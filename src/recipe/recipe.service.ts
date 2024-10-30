@@ -318,7 +318,7 @@ export class RecipeService {
     try {
       const { id, title, servings, photoUrl, ingredients, steps, type, preparationTime } = recipe;
 
-      return await this.prismaService.$transaction(async (tsx) => {
+      await this.prismaService.$transaction(async (tsx) => {
         await tsx.recipes.update({
           where: { id },
           data: { title, servings, photoUrl, type, preparationTime },
@@ -333,12 +333,68 @@ export class RecipeService {
         for (let ingredient of ingredients) {
           const { calories, carbs, proteins, fats, quantity, measure } = ingredient;
 
-          const unit = await tsx.units.findFirst({ where: { label: measure } });
+          let unitId;
 
-          await tsx.recipes_ingredients.updateMany({
-            where: { AND: [{ recipeId: recipe.id }, { ingredientId: ingredient.id }] },
-            data: { calories, carbs, proteins, fats, quantity, unitId: unit.id },
+          const existentUnit = await tsx.units.findFirst({
+            where: { label: measure },
           });
+
+          if (!existentUnit) {
+            const newUnit = await tsx.units.create({ data: { label: measure, uri: ingredient.uri } });
+            unitId = newUnit.id;
+          } else {
+            unitId = existentUnit.id;
+          }
+
+          //* If the current ingredient has no id, it means it does not exist yet in DB and will be added
+          if (!ingredient.id) {
+            let ingredientId;
+
+            const ingredientFromDB = await tsx.ingredients.findFirst({ where: { foodId: ingredient.foodId } });
+
+            if (!ingredientFromDB) {
+              const newIngredient = await tsx.ingredients.create({
+                data: { foodId: ingredient.foodId, name: ingredient.title },
+              });
+              ingredientId = newIngredient.id;
+            } else {
+              ingredientId = ingredientFromDB.id;
+            }
+
+            await tsx.recipes_ingredients.create({
+              data: {
+                calories,
+                carbs,
+                proteins,
+                fats,
+                quantity,
+                recipeId: recipe.id,
+                unitId,
+                ingredientId,
+              },
+            });
+
+            ingredient.id = ingredientId;
+
+            //* Otherwise just update the existing one
+          } else {
+            await tsx.recipes_ingredients.updateMany({
+              where: { AND: [{ recipeId: recipe.id }, { ingredientId: ingredient.id }] },
+              data: {
+                calories,
+                carbs,
+                proteins,
+                fats,
+                quantity,
+                unitId,
+              },
+            });
+          }
+
+          // await tsx.recipes_ingredients.updateMany({
+          //   where: { AND: [{ recipeId: recipe.id }, { ingredientId: ingredient.id }] },
+          //   data: { calories, carbs, proteins, fats, quantity, unitId: unit.id },
+          // });
         }
 
         if (stepsIds) {
@@ -352,6 +408,14 @@ export class RecipeService {
           });
         }
       });
+
+      return {
+        id,
+        title,
+        servings,
+        photoUrl,
+        ingredients,
+      };
     } catch (error) {
       console.log(error);
       throw new HttpException({ error }, HttpStatus.CONFLICT);

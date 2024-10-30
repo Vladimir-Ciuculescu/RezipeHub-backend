@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsNumber, IsString, ValidateIf, ValidateNested } from "class-validator";
+import { ArrayMinSize, IsArray, IsNumber, IsOptional, IsString, ValidateIf, ValidateNested } from "class-validator";
 import { CreateUnitDto } from "src/units/dtos/units.dto";
 
 export class IngredientDto {
@@ -47,14 +47,19 @@ export class CreateIngredientDto {
 }
 
 export class EditIngredientDto {
+  @IsOptional()
   @IsNumber()
-  id: number;
+  id?: number;
 
   @IsString()
   foodId: string;
 
   @IsString()
   title: string;
+
+  @IsOptional()
+  @IsString()
+  uri?: string;
 
   @IsNumber()
   quantity: number;
