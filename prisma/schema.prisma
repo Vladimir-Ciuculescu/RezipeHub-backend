@@ -87,7 +87,6 @@ model units {
   label       String                @unique
   ingredients recipes_ingredients[]
 
-  // ingredientUnits ingredient_units[]
 }
 
 model recipes_ingredients {

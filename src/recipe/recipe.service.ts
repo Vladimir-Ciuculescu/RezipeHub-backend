@@ -390,22 +390,26 @@ export class RecipeService {
               },
             });
           }
-
-          // await tsx.recipes_ingredients.updateMany({
-          //   where: { AND: [{ recipeId: recipe.id }, { ingredientId: ingredient.id }] },
-          //   data: { calories, carbs, proteins, fats, quantity, unitId: unit.id },
-          // });
         }
 
         if (stepsIds) {
           await tsx.steps.deleteMany({ where: { AND: [{ id: { in: stepsIds } }, { recipeId: id }] } });
         }
 
-        for (let step of steps) {
-          await tsx.steps.update({
-            where: { id: step.id },
-            data: { text: step.description },
-          });
+        //TODO : Look here too boss
+
+        for (let currentStep of steps) {
+          const { step, description } = currentStep;
+
+          if (!currentStep.id) {
+            const newStep = await tsx.steps.create({ data: { step, text: description, recipeId: id } });
+            currentStep.id = newStep.id;
+          } else {
+            await tsx.steps.update({
+              where: { id: currentStep.id },
+              data: { text: currentStep.description },
+            });
+          }
         }
       });
 
@@ -415,6 +419,7 @@ export class RecipeService {
         servings,
         photoUrl,
         ingredients,
+        steps,
       };
     } catch (error) {
       console.log(error);

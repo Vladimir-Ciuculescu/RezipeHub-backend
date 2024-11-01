@@ -11,32 +11,35 @@ export class FavoritesService {
 
     try {
       const favorites = await this.prismaService.users_favorites.findMany({
+        select: {
+          recipe: {
+            select: {
+              id: true,
+
+              title: true,
+              photoUrl: true,
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  photoUrl: true,
+                },
+              },
+            },
+          },
+        },
         where: {
           userId,
         },
-
         orderBy: {
           createdAt: "desc",
-        },
-        include: {
-          recipe: true,
-          user: true,
         },
         skip: limit * page,
         take: limit,
       });
 
-      const formattedFavorites = favorites.map((favorite) => ({
-        id: favorite.recipe.id,
-        title: favorite.recipe.title,
-        photoUrl: favorite.recipe.photoUrl,
-        user: {
-          id: favorite.user.id,
-          firstName: favorite.user.firstName,
-          lastName: favorite.user.lastName,
-          photoUrl: favorite.user.photoUrl,
-        },
-      }));
+      const formattedFavorites = favorites.map((favorite) => favorite.recipe);
 
       return formattedFavorites;
     } catch (error) {
