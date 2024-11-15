@@ -123,6 +123,7 @@ Yumhub`,
           email: true,
           photoUrl: true,
           bio: true,
+          isVerified: true,
         },
       });
 

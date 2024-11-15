@@ -51,6 +51,7 @@ export class AuthService {
       lastName: user.lastName,
       photoUrl: user.photoUrl,
       bio: user.bio,
+      isVerified: user.isVerified,
     };
 
     const { accessToken, refreshToken } = await this.generateTokens(payload);
@@ -97,7 +98,7 @@ export class AuthService {
         });
       }
 
-      const { id, email, firstName, lastName, photoUrl } = existentUser;
+      const { id, email, firstName, lastName, photoUrl, bio, isVerified } = existentUser;
 
       payload = {
         id,
@@ -105,6 +106,8 @@ export class AuthService {
         firstName,
         lastName,
         photoUrl,
+        bio,
+        isVerified,
       };
     } else {
       const newUser = await this.prismaService.users.create({
@@ -128,6 +131,7 @@ export class AuthService {
         lastName: newUser.lastName,
         photoUrl: newUser.photoUrl,
         bio: newUser.bio,
+        isVerified: newUser.isVerified,
       };
     }
     const { accessToken, refreshToken } = await this.generateTokens(payload);
