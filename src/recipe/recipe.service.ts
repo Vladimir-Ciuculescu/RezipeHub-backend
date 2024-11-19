@@ -1,5 +1,6 @@
 import { BadGatewayException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import {
+  ByCategoryRecipesDto,
   CreateRecipeDto,
   EditRecipeDto,
   EditRecipePhotoDto,
@@ -115,6 +116,47 @@ export class RecipeService {
       });
 
       return mostPopularRecipes;
+    } catch (error) {
+      console.log(error);
+      throw new BadGatewayException();
+    }
+  }
+
+  async getRecipesByCategory(query: ByCategoryRecipesDto) {
+    const { userId, category, limit, page } = query;
+
+    try {
+      const recipes = await this.prismaService.recipes.findMany({
+        where: {
+          AND: [{ userId: { not: userId } }, { type: category }],
+        },
+        select: {
+          id: true,
+          title: true,
+          photoUrl: true,
+          preparationTime: true,
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              photoUrl: true,
+            },
+          },
+          user_favorites: {
+            where: {
+              userId: query.userId,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: limit * page,
+        take: limit,
+      });
+
+      return recipes;
     } catch (error) {
       console.log(error);
       throw new BadGatewayException();

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Put, Query, UseGuards, UseInterceptors } from "@nestjs/common";
 import { RecipeService } from "./recipe.service";
 import {
+  ByCategoryRecipesDto,
   CreateRecipeDto,
   EditRecipeDto,
   EditRecipePhotoDto,
@@ -36,6 +37,13 @@ export class RecipeController {
   @Get("/most-popular")
   getMostPopularRecipes(@Query() query: MostPopularRecipesDto) {
     return this.recipeService.getMostPopularRecipes(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Get("/by-category")
+  getRecipesByCategory(@Query() query: ByCategoryRecipesDto) {
+    return this.recipeService.getRecipesByCategory(query);
   }
 
   @UseGuards(JwtAuthGuard)

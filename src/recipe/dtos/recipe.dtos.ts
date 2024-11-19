@@ -158,6 +158,23 @@ export class MostPopularRecipesDto {
   limit: number;
 }
 
+export class ByCategoryRecipesDto {
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.userId))
+  userId: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.page))
+  page: number;
+
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.limit))
+  limit: number;
+
+  @IsString()
+  category: string;
+}
+
 export class RecipesPerUserDto {
   @IsNumber()
   @Transform(({ obj }) => parseInt(obj.page))
