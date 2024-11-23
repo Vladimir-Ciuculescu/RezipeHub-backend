@@ -106,10 +106,10 @@ export class RecipeService {
           },
         },
         orderBy: [
+          { viewCount: "desc" },
           {
             user_favorites: { _count: "desc" },
           },
-          { viewCount: "desc" },
         ],
         skip: limit * page,
         take: limit,
