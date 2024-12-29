@@ -10,6 +10,7 @@ import { RefreshJwtGuard } from "./guards/refresh-jwt.guard";
 import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
 import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
 import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
+import { UserLoginDto } from "src/public/users/dtos/user-login.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -25,8 +26,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   @Post("/login")
-  loginUser(@CurrentUser() user: UserRequestDto) {
-    return this.authService.login(user);
+  loginUser(@CurrentUser() user: UserRequestDto, @Body() body: UserLoginDto) {
+    return this.authService.login({ ...user, deviceToken: body.deviceToken, platform: body.platform });
   }
 
   @HttpCode(200)

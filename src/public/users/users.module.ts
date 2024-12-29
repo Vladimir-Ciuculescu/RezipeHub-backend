@@ -8,9 +8,20 @@ import { EmailService } from "src/email/email.service";
 import { TokenService } from "src/token/token.service";
 import { S3Service } from "src/s3/s3.service";
 import { S3Client } from "@aws-sdk/client-s3";
+import { DevicesService } from "src/devices/devices.service";
 
 @Module({
   controllers: [UsersController],
-  providers: [AuthService, UsersService, PrismaService, JwtService, EmailService, TokenService, S3Service, S3Client],
+  providers: [
+    AuthService,
+    UsersService,
+    PrismaService,
+    JwtService,
+    EmailService,
+    TokenService,
+    S3Service,
+    S3Client,
+    DevicesService,
+  ],
 })
 export class UsersModule {}

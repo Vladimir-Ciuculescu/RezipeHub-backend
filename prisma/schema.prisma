@@ -31,9 +31,33 @@ model users {
   tokens          tokens[]
   socialProvider  auth_methods[]
   recipes         recipes[]
+  devices         user_devices[]
+  notifications   notifications[]
   users_favorites users_favorites[]
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedtAt      DateTime          @default(now()) @map("updated_at")
+}
+
+model user_devices {
+  id          Int    @id @default(autoincrement())
+  userId      Int    @map("user_id")
+  user        users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceToken String @unique @map("device_token")
+  deviceType  String
+
+  @@index([userId])
+}
+
+model notifications {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  data      Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
 }
 
 model auth_methods {
@@ -86,7 +110,6 @@ model units {
   uri         String                @unique
   label       String                @unique
   ingredients recipes_ingredients[]
-
 }
 
 model recipes_ingredients {
@@ -97,7 +120,7 @@ model recipes_ingredients {
   ingredientId Int         @map("ingredient_id")
   unit         units       @relation(fields: [unitId], references: [id], onDelete: Cascade)
   unitId       Int         @map("unit_id")
-  quantity     Int
+  quantity     Decimal     @db.Decimal(10, 2)
   calories     Float       @default(0.00)
   carbs        Decimal?    @db.Decimal(10, 2)
   proteins     Decimal?    @db.Decimal(10, 2)

@@ -21,4 +21,10 @@ export class UserRequestDto {
 
   @IsBoolean()
   isVerified: string;
+
+  @IsString()
+  deviceToken: string;
+
+  @IsString()
+  platform: string;
 }

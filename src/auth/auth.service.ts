@@ -1,12 +1,4 @@
-import {
-  BadGatewayException,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-  forwardRef,
-} from "@nestjs/common";
+import { BadGatewayException, HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
 import { UsersService } from "src/public/users/users.service";
@@ -17,6 +9,8 @@ import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.
 import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
 import { TokenType } from "types/enums";
 import { hashPassword } from "src/utils/hashPassword";
+import { DevicesService } from "src/devices/devices.service";
+import { AddDeviceDto } from "src/devices/devices.dto";
 
 @Injectable()
 export class AuthService {
@@ -25,6 +19,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
+    private readonly devicesService: DevicesService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -58,6 +53,14 @@ export class AuthService {
 
     await this.updateRefreshToken(user.id, refreshToken);
 
+    const devicePayload: AddDeviceDto = {
+      userId: user.id,
+      deviceToken: user.deviceToken,
+      deviceType: user.platform,
+    };
+
+    await this.devicesService.addDeviceToken(devicePayload);
+
     return {
       user: { ...payload },
       access_token: accessToken,
@@ -66,7 +69,7 @@ export class AuthService {
   }
 
   async socialLogin(user: SocialUserRequestDto) {
-    const { email, provider, providerUserId, firstName, lastName } = user;
+    const { email, provider, providerUserId, firstName, lastName, deviceToken, platform } = user;
 
     let payload;
 
@@ -137,6 +140,15 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(payload);
 
     await this.updateRefreshToken(userId, refreshToken);
+
+    const devicePayload: AddDeviceDto = {
+      userId,
+      deviceToken,
+      deviceType: platform,
+    };
+
+    //* Register expo push token
+    await this.devicesService.addDeviceToken(devicePayload);
 
     return {
       user: { ...payload },

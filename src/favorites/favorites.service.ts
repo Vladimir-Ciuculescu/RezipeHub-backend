@@ -1,10 +1,14 @@
 import { BadGatewayException, Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma.service";
 import { GetFavoritesDto, IsFavoriteDto } from "./favorites.dto";
+import { NotificationsService } from "src/notifications/notifications.service";
 
 @Injectable()
 export class FavoritesService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async getFavorites(query: GetFavoritesDto) {
     const { limit, page, userId } = query;
@@ -76,6 +80,8 @@ export class FavoritesService {
     const { userId, recipeId } = body;
 
     try {
+      const recipeOwner = await this.prismaService.recipes.findFirst({ where: { id: recipeId } });
+
       const favoriteRecipe = await this.getIsInFavorites(body);
 
       if (favoriteRecipe) {
@@ -86,6 +92,8 @@ export class FavoritesService {
         };
       } else {
         await this.prismaService.users_favorites.create({ data: { recipeId, userId } });
+
+        await this.notificationsService.addToFavoritesNotification(recipeOwner.userId, body.userId);
 
         return {
           message: "Recipe added from favorites !",
