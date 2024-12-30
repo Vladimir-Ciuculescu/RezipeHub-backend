@@ -1,5 +1,4 @@
-import { Injectable } from "@nestjs/common";
-import Expo from "expo-server-sdk";
+import { BadGatewayException, Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma.service";
 import { ExpoService } from "src/expo/expo.service";
 
@@ -10,6 +9,33 @@ export class NotificationsService {
     private readonly expoService: ExpoService,
   ) {}
 
+  async getNotifications(query) {
+    const { userId, page, limit } = query;
+
+    try {
+      const notifications = await this.prismaService.notifications.findMany({
+        where: { userId },
+        select: {
+          id: true,
+          title: true,
+          body: true,
+          data: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: limit * page,
+        take: limit,
+      });
+
+      return notifications;
+    } catch (error) {
+      console.log("Error fetching the notifications ! :", error);
+      throw new BadGatewayException();
+    }
+  }
+
   async addToFavoritesNotification(userId: number, senderId: number) {
     const sender = await this.prismaService.users.findFirst({ where: { id: senderId } });
 
@@ -17,11 +43,15 @@ export class NotificationsService {
 
     const deviceTokens = devices.map((device) => device.deviceToken);
 
+    await this.prismaService.notifications.create({
+      data: { userId, title: `${sender.firstName} ${sender.lastName}`, body: "has appreciated your recipe" },
+    });
+
     const notificationPayload = {
       title: `${sender.firstName} ${sender.lastName}`,
       body: "has appreciated your recipe",
       data: {
-        title: "hello",
+        url: "(tabs)/notifications",
       },
     };
 

@@ -19,6 +19,7 @@ import { PrismaService } from "prisma.service";
 import { ExpoModule } from "./expo/expo.module";
 import Expo from "expo-server-sdk";
 import { ExpoService } from "./expo/expo.service";
+import { NotificationsController } from './notifications/notifications.controller';
 
 @Module({
   imports: [
@@ -37,5 +38,6 @@ import { ExpoService } from "./expo/expo.service";
     ExpoModule,
   ],
   providers: [S3Service, S3Client, NotificationsService, DevicesService, PrismaService, Expo, ExpoService],
+  controllers: [NotificationsController],
 })
 export class AppModule {}
