@@ -20,7 +20,7 @@ export class FavoritesController {
   getIsInFavorites(@Query() query: IsFavoriteDto) {
     return this.favoritesService.getIsInFavorites(query);
   }
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post("/toggle-favorite")
   toggleFavoriteRecipe(@Body() body: IsFavoriteDto) {

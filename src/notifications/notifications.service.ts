@@ -1,6 +1,7 @@
 import { BadGatewayException, Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma.service";
 import { ExpoService } from "src/expo/expo.service";
+import { ResetBadgeCountDto } from "./notifications.dto";
 
 @Injectable()
 export class NotificationsService {
@@ -36,15 +37,31 @@ export class NotificationsService {
     }
   }
 
-  async addToFavoritesNotification(userId: number, senderId: number) {
+  async addToFavoritesNotification(userId: number, senderId: number, recipeId: number) {
     const sender = await this.prismaService.users.findFirst({ where: { id: senderId } });
+
+    await this.prismaService.user_devices.updateMany({
+      where: { userId },
+      data: {
+        badgeCount: {
+          increment: 1,
+        },
+      },
+    });
 
     const devices = await this.prismaService.user_devices.findMany({ where: { userId: userId } });
 
-    const deviceTokens = devices.map((device) => device.deviceToken);
+    const deviceTokens = devices.map((device) => ({ deviceToken: device.deviceToken, badge: device.badgeCount }));
 
     await this.prismaService.notifications.create({
-      data: { userId, title: `${sender.firstName} ${sender.lastName}`, body: "has appreciated your recipe" },
+      data: {
+        userId,
+        title: `${sender.firstName} ${sender.lastName}`,
+        body: "has appreciated your recipe",
+        data: {
+          recipeId,
+        },
+      },
     });
 
     const notificationPayload = {
@@ -56,5 +73,16 @@ export class NotificationsService {
     };
 
     await this.expoService.sendExpoPushNotification(deviceTokens, notificationPayload);
+  }
+
+  async resetBadgeCountNotification(body: ResetBadgeCountDto) {
+    const { deviceToken } = body;
+
+    try {
+      await this.prismaService.user_devices.update({ where: { deviceToken }, data: { badgeCount: 0 } });
+    } catch (error) {
+      console.log("Error fetching the notifications ! :", error);
+      throw new BadGatewayException();
+    }
   }
 }

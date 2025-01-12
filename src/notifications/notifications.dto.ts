@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsNumber } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class NotificationsDto {
   @IsNumber()
@@ -13,4 +13,9 @@ export class NotificationsDto {
   @IsNumber()
   @Transform(({ obj }) => parseInt(obj.limit))
   limit: number;
+}
+
+export class ResetBadgeCountDto {
+  @IsString()
+  deviceToken: string;
 }

@@ -93,7 +93,7 @@ export class FavoritesService {
       } else {
         await this.prismaService.users_favorites.create({ data: { recipeId, userId } });
 
-        await this.notificationsService.addToFavoritesNotification(recipeOwner.userId, body.userId);
+        await this.notificationsService.addToFavoritesNotification(recipeOwner.userId, body.userId, recipeId);
 
         return {
           message: "Recipe added from favorites !",

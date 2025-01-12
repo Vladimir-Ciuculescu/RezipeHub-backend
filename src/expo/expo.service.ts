@@ -7,28 +7,35 @@ interface NotificationPayload {
   data?: Record<string, unknown>;
 }
 
+interface DeviceToken {
+  deviceToken: string;
+  badge: number;
+}
+
 @Injectable()
 export class ExpoService {
   constructor(private readonly expo: Expo) {}
 
-  async sendExpoPushNotification(deviceTokens: string[], notificationPayload: NotificationPayload) {
+  async sendExpoPushNotification(deviceTokens: DeviceToken[], notificationPayload: NotificationPayload) {
     const { title, body, data } = notificationPayload;
 
     try {
       let notifications: ExpoPushMessage[] = [];
 
       for (let deviceToken of deviceTokens) {
-        if (!Expo.isExpoPushToken(deviceToken)) {
-          console.error(`Push token ${deviceToken} not valid !`);
+        if (!Expo.isExpoPushToken(deviceToken.deviceToken)) {
+          console.error(`Push token ${deviceToken.deviceToken} not valid !`);
           continue;
         }
 
         notifications.push({
-          to: deviceToken,
+          to: deviceToken.deviceToken,
           sound: "default",
           title,
           body,
           data: data || {},
+          badge: deviceToken.badge,
+          // badge: deviceToken.badge + 1,
         });
       }
 

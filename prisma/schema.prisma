@@ -44,6 +44,7 @@ model user_devices {
   user        users  @relation(fields: [userId], references: [id], onDelete: Cascade)
   deviceToken String @unique @map("device_token")
   deviceType  String
+  badgeCount  Int    @default(0)
 
   @@index([userId])
 }
