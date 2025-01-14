@@ -1,5 +1,5 @@
-import { IsEnum, IsString } from 'class-validator';
-import { SocialProvider } from 'types/enums';
+import { IsEnum, IsString } from "class-validator";
+import { SocialProvider } from "types/enums";
 
 export class SocialUserRequestDto {
   @IsEnum(SocialProvider)
@@ -16,4 +16,10 @@ export class SocialUserRequestDto {
 
   @IsString()
   lastName: string;
+
+  @IsString()
+  deviceToken: string;
+
+  @IsString()
+  platform: string;
 }

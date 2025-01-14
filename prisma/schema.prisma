@@ -18,19 +18,48 @@ enum token_type {
 }
 
 model users {
-  id             Int            @id @default(autoincrement())
-  email          String         @unique
-  username       String?        @unique
-  firstName      String         @map("first_name")
-  lastName       String         @map("last_name")
-  password       String?
-  isVerified     Boolean        @default(false) @map("is_verified")
-  refreshToken   String?        @map("refresh_token") @db.VarChar(256)
-  tokens         tokens[]
-  socialProvider auth_methods[]
-  recipes        recipes[]
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedtAt     DateTime       @default(now()) @map("updated_at")
+  id              Int               @id @default(autoincrement())
+  email           String            @unique
+  username        String?           @unique
+  firstName       String            @map("first_name")
+  lastName        String            @map("last_name")
+  password        String?
+  photoUrl        String?           @map("photo_url")
+  bio             String            @default("")
+  isVerified      Boolean           @default(false) @map("is_verified")
+  refreshToken    String?           @map("refresh_token") @db.VarChar(256)
+  tokens          tokens[]
+  socialProvider  auth_methods[]
+  recipes         recipes[]
+  devices         user_devices[]
+  notifications   notifications[]
+  users_favorites users_favorites[]
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedtAt      DateTime          @default(now()) @map("updated_at")
+}
+
+model user_devices {
+  id          Int    @id @default(autoincrement())
+  userId      Int    @map("user_id")
+  user        users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceToken String @unique @map("device_token")
+  deviceType  String
+  badgeCount  Int    @default(0)
+
+  @@index([userId])
+}
+
+model notifications {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
 }
 
 model auth_methods {
@@ -54,42 +83,67 @@ model tokens {
 }
 
 model recipes {
-  id          Int                   @id @default(autoincrement()) 
-  user        users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int                   @map("user_id")
-  title       String
-  servings    Int
-  photoUrl    String?               @map("photo_url")
-  createdAt   DateTime              @default(now()) @map("created_at")
-  updatedtAt  DateTime              @default(now()) @map("updated_at")
-  ingredients recipes_ingredients[]
-  steps       steps[]
+  id              Int                   @id @default(autoincrement())
+  user            users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int                   @map("user_id")
+  title           String
+  servings        Int
+  photoUrl        String?               @map("photo_url")
+  type            String
+  preparationTime Int                   @map("preparation_time")
+  viewCount       Int                   @default(0) @map("view_count")
+  ingredients     recipes_ingredients[]
+  user_favorites  users_favorites[]
+  steps           steps[]
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @default(now()) @map("updated_at")
 }
 
 model ingredients {
-  id       Int                   @id @default(autoincrement())
-  name     String
-  unit     String
-  quantity Int
-  calories Float   
-  carbs    Float
-  proteins Float
-  fats     Float
-  recipes  recipes_ingredients[]
+  id     Int                   @id @default(autoincrement())
+  foodId String                @unique @map("food_id")
+  name   String
+  // units   ingredient_units[]
+  units  recipes_ingredients[]
+}
+
+model units {
+  id          Int                   @id @default(autoincrement())
+  uri         String                @unique
+  label       String                @unique
+  ingredients recipes_ingredients[]
 }
 
 model recipes_ingredients {
   id           Int         @id @default(autoincrement())
   recipe       recipes     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  recipeId     Int
+  recipeId     Int         @map("recipe_id")
   ingredient   ingredients @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
-  ingredientId Int
+  ingredientId Int         @map("ingredient_id")
+  unit         units       @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  unitId       Int         @map("unit_id")
+  quantity     Decimal     @db.Decimal(10, 2)
+  calories     Float       @default(0.00)
+  carbs        Decimal?    @db.Decimal(10, 2)
+  proteins     Decimal?    @db.Decimal(10, 2)
+  fats         Decimal?    @db.Decimal(10, 2)
+}
+
+model users_favorites {
+  id        Int      @id @default(autoincrement())
+  recipe    recipes  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId  Int      @map("recipe_id")
+  user      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([recipeId, userId])
 }
 
 model steps {
   id       Int     @id @default(autoincrement())
   recipe   recipes @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  recipeId Int
+  recipeId Int     @map("recipe_id")
   step     Int
   text     String
 }

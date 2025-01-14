@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNumber, IsString } from "class-validator";
 
 export class UserRequestDto {
   @IsNumber()
@@ -12,4 +12,19 @@ export class UserRequestDto {
 
   @IsString()
   lastName: string;
+
+  @IsString()
+  photoUrl: string;
+
+  @IsString()
+  bio: string;
+
+  @IsBoolean()
+  isVerified: string;
+
+  @IsString()
+  deviceToken: string;
+
+  @IsString()
+  platform: string;
 }
