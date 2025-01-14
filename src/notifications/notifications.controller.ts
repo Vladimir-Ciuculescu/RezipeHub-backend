@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpCode, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { NotificationsService } from "./notifications.service";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
-import { NotificationsDto, ResetBadgeCountDto } from "./notifications.dto";
+import { MarkAsReadDto, NotificationsDto, ResetBadgeCountDto } from "./notifications.dto";
 
 @Controller("notifications")
 export class NotificationsController {
@@ -19,5 +19,12 @@ export class NotificationsController {
   @Post("/reset-badge")
   resetBadgeCount(@Body() body: ResetBadgeCountDto) {
     return this.notificationsService.resetBadgeCountNotification(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Put("/mark-as-read")
+  markAsReadNotification(@Body() params: MarkAsReadDto) {
+    return this.notificationsService.markAsReadNotification(params);
   }
 }

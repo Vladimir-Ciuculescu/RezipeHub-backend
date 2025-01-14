@@ -1,7 +1,7 @@
 import { BadGatewayException, Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma.service";
 import { ExpoService } from "src/expo/expo.service";
-import { ResetBadgeCountDto } from "./notifications.dto";
+import { MarkAsReadDto, ResetBadgeCountDto } from "./notifications.dto";
 
 @Injectable()
 export class NotificationsService {
@@ -22,6 +22,7 @@ export class NotificationsService {
           body: true,
           data: true,
           createdAt: true,
+          read: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -30,7 +31,35 @@ export class NotificationsService {
         take: limit,
       });
 
-      return notifications;
+      // Get recipe photos for notifications that have a recipeId
+      const notificationsWithPhotos = await Promise.all(
+        notifications.map(async (notification) => {
+          if (notification.data && notification.data["recipeId"]) {
+            const recipe = await this.prismaService.recipes.findUnique({
+              where: { id: notification.data["recipeId"] },
+              select: { photoUrl: true },
+            });
+            return {
+              ...notification,
+              data: {
+                //@ts-ignore
+                ...notification.data,
+                recipePhotoUrl: recipe?.photoUrl || null,
+              },
+            };
+          }
+          return {
+            ...notification,
+            data: {
+              //@ts-ignore
+              ...notification.data,
+              recipePhotoUrl: null,
+            },
+          };
+        }),
+      );
+
+      return notificationsWithPhotos;
     } catch (error) {
       console.log("Error fetching the notifications ! :", error);
       throw new BadGatewayException();
@@ -82,6 +111,17 @@ export class NotificationsService {
       await this.prismaService.user_devices.update({ where: { deviceToken }, data: { badgeCount: 0 } });
     } catch (error) {
       console.log("Error fetching the notifications ! :", error);
+      throw new BadGatewayException();
+    }
+  }
+
+  async markAsReadNotification(params: MarkAsReadDto) {
+    const { notificationId } = params;
+
+    try {
+      await this.prismaService.notifications.update({ where: { id: notificationId }, data: { read: true } });
+    } catch (error) {
+      console.log("Error marking notification as read :", error);
       throw new BadGatewayException();
     }
   }

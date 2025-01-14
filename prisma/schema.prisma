@@ -56,6 +56,7 @@ model notifications {
   title     String
   body      String
   data      Json?
+  read      Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
 
   @@index([userId, createdAt])

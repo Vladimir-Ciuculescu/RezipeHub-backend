@@ -19,3 +19,9 @@ export class ResetBadgeCountDto {
   @IsString()
   deviceToken: string;
 }
+
+export class MarkAsReadDto {
+  @IsNumber()
+  @Transform(({ obj }) => parseInt(obj.notificationId))
+  notificationId: number;
+}
