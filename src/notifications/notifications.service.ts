@@ -80,7 +80,9 @@ export class NotificationsService {
 
     const devices = await this.prismaService.user_devices.findMany({ where: { userId: userId } });
 
-    const deviceTokens = devices.map((device) => ({ deviceToken: device.deviceToken, badge: device.badgeCount }));
+    const deviceTokens = devices
+      .filter((devices) => devices.notificationsEnabled)
+      .map((device) => ({ deviceToken: device.deviceToken, badge: device.badgeCount }));
 
     await this.prismaService.notifications.create({
       data: {

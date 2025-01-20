@@ -25,3 +25,8 @@ export class MarkAsReadDto {
   @Transform(({ obj }) => parseInt(obj.notificationId))
   notificationId: number;
 }
+
+export class ToggleNotificationsDto {
+  @IsString()
+  expoPushToken: string;
+}
