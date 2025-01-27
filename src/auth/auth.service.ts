@@ -23,19 +23,24 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string) {
-    const user = await this.usersService.findUser(email);
+    try {
+      const user = await this.usersService.findUser(email);
 
-    if (!user) {
-      return null;
+      if (!user) {
+        return null;
+      }
+
+      const isMatchPassword = await bcrypt.compare(password, user.password);
+
+      if (!isMatchPassword) {
+        return null;
+      }
+
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException({ error: "Error validating user " }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    const isMatchPassword = await bcrypt.compare(password, user.password);
-
-    if (!isMatchPassword) {
-      return null;
-    }
-
-    return user;
   }
 
   async login(user: UserRequestDto) {
@@ -252,5 +257,14 @@ export class AuthService {
         refreshToken: hashedToken,
       },
     });
+  }
+
+  async logOut(userId: number) {
+    try {
+      await this.prismaService.users.update({ where: { id: userId }, data: { refreshToken: null } });
+    } catch (error) {
+      console.log(error);
+      throw new HttpException({ error: "Error logging out user" }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
@@ -11,6 +11,7 @@ import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
 import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
 import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
 import { UserLoginDto } from "src/public/users/dtos/user-login.dto";
+import { UserLogoutDto } from "src/public/users/dtos/user-logout.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -55,5 +56,12 @@ export class AuthController {
   @Post("/refresh")
   async refreshTokens(@Req() req) {
     return this.authService.refreshTokens(req.user, req.user.refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Delete("/logout")
+  async logOut(@Body() body: UserLogoutDto) {
+    return this.authService.logOut(body.id);
   }
 }
