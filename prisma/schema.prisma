@@ -18,24 +18,25 @@ enum token_type {
 }
 
 model users {
-  id              Int               @id @default(autoincrement())
-  email           String            @unique
-  username        String?           @unique
-  firstName       String            @map("first_name")
-  lastName        String            @map("last_name")
-  password        String?
-  photoUrl        String?           @map("photo_url")
-  bio             String            @default("")
-  isVerified      Boolean           @default(false) @map("is_verified")
-  refreshToken    String?           @map("refresh_token") @db.VarChar(256)
-  tokens          tokens[]
-  socialProvider  auth_methods[]
-  recipes         recipes[]
-  devices         user_devices[]
-  notifications   notifications[]
-  users_favorites users_favorites[]
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedtAt      DateTime          @default(now()) @map("updated_at")
+  id                   Int               @id @default(autoincrement())
+  email                String            @unique
+  username             String?           @unique
+  firstName            String            @map("first_name")
+  lastName             String            @map("last_name")
+  password             String?
+  photoUrl             String?           @map("photo_url")
+  bio                  String            @default("")
+  isVerified           Boolean           @default(false) @map("is_verified")
+  refreshToken         String?           @map("refresh_token") @db.VarChar(256)
+  tokens               tokens[]
+  socialProvider       auth_methods[]
+  recipes              recipes[]
+  devices              user_devices[]
+  notifications        notifications[]
+  notificationsAsActor notifications[]   @relation("NotificationActor")
+  users_favorites      users_favorites[]
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedtAt           DateTime          @default(now()) @map("updated_at")
 }
 
 model user_devices {
@@ -54,6 +55,8 @@ model notifications {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
   user      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actorId   Int?     @map("actor_id")
+  actor     users?   @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
   title     String
   body      String
   data      Json?
