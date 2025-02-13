@@ -1,6 +1,6 @@
-import { ExecutionContext, createParamDecorator } from '@nestjs/common';
-import { Request } from 'express';
-import { UserRequestDto } from 'src/public/users/dtos/user-request.dto';
+import { ExecutionContext, createParamDecorator } from "@nestjs/common";
+import { Request } from "express";
+import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
 
 declare global {
   namespace Express {
@@ -11,10 +11,8 @@ declare global {
   }
 }
 
-export const CurrentUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest() as Request;
+export const CurrentUser = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest() as Request;
 
-    return request.user;
-  },
-);
+  return request.user;
+});

@@ -30,12 +30,16 @@ export class ExpoService {
 
         notifications.push({
           to: deviceToken.deviceToken,
+
+          //* Vladi iPhone DEV Build App token
+          //to: "ExponentPushToken[TrS9XBLNre6qaT-5k8cy1o]",
+          //* Vladi iPhone Productiuon app token
+          //to: "ExponentPushToken[MqZ_ElJdA1E1SnWhngbQ7R]",
           sound: "default",
           title,
           body,
           data: data || {},
           badge: deviceToken.badge,
-          // badge: deviceToken.badge + 1,
         });
       }
 

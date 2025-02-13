@@ -13,7 +13,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const user = await this.authService.validateUser(email, password);
 
     if (!user) {
-      throw new HttpException({ error: "User not found !" }, HttpStatus.NOT_FOUND);
+      throw new HttpException({ error: "User not found", code: 404 }, HttpStatus.NOT_FOUND);
     }
 
     return user;

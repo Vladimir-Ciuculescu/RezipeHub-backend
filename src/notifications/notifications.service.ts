@@ -88,7 +88,7 @@ export class NotificationsService {
       data: {
         userId,
         title: `${sender.firstName} ${sender.lastName}`,
-        body: "has appreciated your recipe",
+        body: "appreciated your recipe",
         data: {
           recipeId,
         },
@@ -97,7 +97,7 @@ export class NotificationsService {
 
     const notificationPayload = {
       title: `${sender.firstName} ${sender.lastName}`,
-      body: "has appreciated your recipe",
+      body: "appreciated your recipe",
       data: {
         url: "(tabs)/notifications",
       },

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
 import { PrismaService } from "prisma.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { hashPassword } from "src/utils/hashPassword";
@@ -135,7 +135,8 @@ Yumhub`,
       return accessToken;
     } catch (error) {
       console.log(error);
-      throw new HttpException({ error }, HttpStatus.CONFLICT);
+      // throw new HttpException({ error }, HttpStatus.CONFLICT);
+      throw new NotFoundException();
     }
   }
 

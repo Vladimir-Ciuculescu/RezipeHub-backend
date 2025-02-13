@@ -1,4 +1,12 @@
-import { BadGatewayException, HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
+import {
+  BadGatewayException,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
 import { UsersService } from "src/public/users/users.service";
@@ -205,7 +213,8 @@ export class AuthService {
     });
 
     if (!user || !user.refreshToken) {
-      throw new BadGatewayException();
+      // throw new BadGatewayException();
+      throw new ForbiddenException();
     }
 
     const isMatchRefreshToken = await bcrypt.compare(oldRefreshToken, user.refreshToken);
