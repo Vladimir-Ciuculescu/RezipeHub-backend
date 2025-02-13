@@ -23,6 +23,14 @@ export class NotificationsService {
           data: true,
           createdAt: true,
           read: true,
+          actor: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              photoUrl: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
@@ -87,6 +95,7 @@ export class NotificationsService {
     await this.prismaService.notifications.create({
       data: {
         userId,
+        actorId: senderId,
         title: `${sender.firstName} ${sender.lastName}`,
         body: "appreciated your recipe",
         data: {
