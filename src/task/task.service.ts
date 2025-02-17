@@ -30,9 +30,11 @@ export class TaskService {
     return tickets;
   }
 
-  @Cron("0 10 * * * *	")
+  //Run
+  // @Cron("0 10 * * * *	")
   // @Cron("*/3 * * * * *")
   // @Cron("*/15 * * * * *")
+  @Cron("0 12 */2 * *") // Runs every 2 days at 12:00 PM
   async sendTrendingRecipeNotifications() {
     try {
       const users = await this.prismaService.users.findMany({

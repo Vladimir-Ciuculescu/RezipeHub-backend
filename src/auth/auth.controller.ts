@@ -29,6 +29,12 @@ import { UserLogoutDto } from "src/public/users/dtos/user-logout.dto";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  //! This is to test de deployment
+  @Get("/cats")
+  findAll(@Req() request: Request): string {
+    return "This action returns all cats";
+  }
+
   @Post("/register")
   @HttpCode(201)
   @UseInterceptors(new SerializeInterceptor(UserDto))
