@@ -19,7 +19,12 @@ import { PrismaService } from "prisma.service";
 import { ExpoModule } from "./expo/expo.module";
 import Expo from "expo-server-sdk";
 import { ExpoService } from "./expo/expo.service";
-import { NotificationsController } from './notifications/notifications.controller';
+import { NotificationsController } from "./notifications/notifications.controller";
+import { ScheduleModule } from "@nestjs/schedule";
+import { TaskService } from "./task/task.service";
+import { AiService } from "./ai/ai.service";
+import { HealthModule } from "./health/health.module";
+import { TerminusModule } from "@nestjs/terminus";
 
 @Module({
   imports: [
@@ -36,8 +41,21 @@ import { NotificationsController } from './notifications/notifications.controlle
     FavoritesModule,
     DevicesModule,
     ExpoModule,
+    ScheduleModule.forRoot(),
+    HealthModule,
+    TerminusModule,
   ],
-  providers: [S3Service, S3Client, NotificationsService, DevicesService, PrismaService, Expo, ExpoService],
+  providers: [
+    S3Service,
+    S3Client,
+    NotificationsService,
+    DevicesService,
+    PrismaService,
+    Expo,
+    ExpoService,
+    TaskService,
+    AiService,
+  ],
   controllers: [NotificationsController],
 })
 export class AppModule {}

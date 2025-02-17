@@ -111,7 +111,7 @@ Yumhub`,
   }
 
   async getProfile(payload: GetProfileDto) {
-    const { id } = payload;
+    const { id, expoPushToken } = payload;
 
     try {
       const data = await this.prismaService.users.findFirst({
@@ -127,7 +127,25 @@ Yumhub`,
         },
       });
 
-      const accessToken = await this.jwtService.signAsync(data, {
+      let notificationsEnabled = false;
+
+      if (expoPushToken !== "") {
+        const deviceNotificationsStatus = await this.prismaService.user_devices.findFirst({
+          where: {
+            userId: id,
+            deviceToken: expoPushToken,
+          },
+        });
+
+        notificationsEnabled = deviceNotificationsStatus.notificationsEnabled;
+      }
+
+      const tokenPayload = {
+        ...data,
+        notificationsEnabled,
+      };
+
+      const accessToken = await this.jwtService.signAsync(tokenPayload, {
         secret: process.env.JWT_SECRET_KEY,
         expiresIn: "10m",
       });

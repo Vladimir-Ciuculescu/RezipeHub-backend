@@ -43,7 +43,7 @@ model user_devices {
   id                   Int     @id @default(autoincrement())
   userId               Int     @map("user_id")
   user                 users   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  deviceToken          String  @unique @map("device_token")
+  deviceToken          String? @unique @map("device_token")
   deviceType           String
   badgeCount           Int     @default(0)
   notificationsEnabled Boolean @default(true) @map("notifications_enabled")

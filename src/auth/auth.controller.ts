@@ -74,6 +74,6 @@ export class AuthController {
   @HttpCode(200)
   @Delete("/logout")
   async logOut(@Body() body: UserLogoutDto) {
-    return this.authService.logOut(body.id);
+    return this.authService.logOut(body);
   }
 }

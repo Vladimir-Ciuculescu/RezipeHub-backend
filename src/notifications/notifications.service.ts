@@ -86,20 +86,26 @@ export class NotificationsService {
       },
     });
 
-    const devices = await this.prismaService.user_devices.findMany({ where: { userId: userId } });
+    const devices = await this.prismaService.user_devices.findMany({
+      where: {
+        userId: userId,
+        deviceToken: { not: null },
+        notificationsEnabled: true,
+      },
+    });
 
-    const deviceTokens = devices
-      .filter((devices) => devices.notificationsEnabled)
-      .map((device) => ({ deviceToken: device.deviceToken, badge: device.badgeCount }));
+    const deviceTokens = devices.map((device) => ({ deviceToken: device.deviceToken, badge: device.badgeCount }));
 
     await this.prismaService.notifications.create({
       data: {
         userId,
         actorId: senderId,
-        title: `${sender.firstName} ${sender.lastName}`,
-        body: "appreciated your recipe",
+
+        title: `Appreciation from ${sender.firstName} ${sender.lastName}`,
+        body: `${sender.firstName} ${sender.lastName} appreciated your recipe`,
         data: {
           recipeId,
+          creatorId: userId,
         },
       },
     });

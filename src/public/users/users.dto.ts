@@ -5,6 +5,9 @@ export class GetProfileDto {
   @IsNumber()
   @Transform(({ obj }) => parseInt(obj.id))
   id: number;
+
+  @IsString()
+  expoPushToken: string;
 }
 
 export class EditProfileDto {

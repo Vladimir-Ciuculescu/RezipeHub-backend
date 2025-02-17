@@ -19,6 +19,7 @@ import { TokenType } from "types/enums";
 import { hashPassword } from "src/utils/hashPassword";
 import { DevicesService } from "src/devices/devices.service";
 import { AddDeviceDto } from "src/devices/devices.dto";
+import { UserLogoutDto } from "src/public/users/dtos/user-logout.dto";
 
 @Injectable()
 export class AuthService {
@@ -268,9 +269,22 @@ export class AuthService {
     });
   }
 
-  async logOut(userId: number) {
+  async logOut(body: UserLogoutDto) {
+    const { id, expoPushToken } = body;
+
     try {
-      await this.prismaService.users.update({ where: { id: userId }, data: { refreshToken: null } });
+      await this.prismaService.users.update({ where: { id: id }, data: { refreshToken: null } });
+
+      if (expoPushToken) {
+        await this.prismaService.user_devices.updateMany({
+          where: {
+            AND: [{ userId: id }, { deviceToken: expoPushToken }],
+          },
+          data: {
+            deviceToken: null,
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException({ error: "Error logging out user" }, HttpStatus.INTERNAL_SERVER_ERROR);
