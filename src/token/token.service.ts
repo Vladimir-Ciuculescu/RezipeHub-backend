@@ -1,19 +1,13 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
-import { PrismaService } from 'prisma.service';
-import { generateToken } from 'src/utils/generateToken';
-import * as moment from 'moment';
-import { CreateTokenDto } from './dtos/create-token.dto';
-import { EmailService } from 'src/email/email.service';
-import { ConfirmTokenDto } from './dtos/confirm-token.dto';
-import { UsersService } from 'src/public/users/users.service';
-import { TokenType } from 'types/enums';
-import { SendResetEmailDto } from 'src/public/users/dtos/send-reset-email.dto';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
+import { PrismaService } from "prisma.service";
+import { generateToken } from "src/utils/generateToken";
+import { CreateTokenDto } from "./dtos/create-token.dto";
+import { EmailService } from "src/email/email.service";
+import { ConfirmTokenDto } from "./dtos/confirm-token.dto";
+import { UsersService } from "src/public/users/users.service";
+import { TokenType } from "types/enums";
+import { SendResetEmailDto } from "src/public/users/dtos/send-reset-email.dto";
+import * as dayjs from "dayjs";
 
 @Injectable()
 export class TokenService {
@@ -33,7 +27,8 @@ export class TokenService {
           userId,
           token,
           type: TokenType.ACCOUNT_VERIFICATION,
-          expiresAt: moment().add(24, 'hours').toDate(),
+          // expiresAt: moment().add(24, "hours").toDate(),
+          expiresAt: dayjs().add(24, "hour").toISOString(),
         },
       });
     } catch (error) {
@@ -50,10 +45,7 @@ export class TokenService {
       });
 
       if (!user) {
-        throw new HttpException(
-          { error: 'User not found !' },
-          HttpStatus.CONFLICT,
-        );
+        throw new HttpException({ error: "User not found !" }, HttpStatus.CONFLICT);
       }
 
       await this.prismaService.tokens.deleteMany({
@@ -69,7 +61,8 @@ export class TokenService {
           userId: user.id,
           token: newToken,
           type: TokenType.PASSWORD_RESET,
-          expiresAt: moment().add(1, 'hours').toDate(),
+          // expiresAt: moment().add(1, 'hours').toDate(),
+          expiresAt: dayjs().add(24, "hour").toISOString(),
         },
       });
 
@@ -103,26 +96,20 @@ YumHub`,
     });
 
     if (!tokenObj) {
-      throw new HttpException(
-        { error: 'Token not found or expired !' },
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException({ error: "Token not found or expired !" }, HttpStatus.CONFLICT);
     }
 
     const now = new Date();
 
     if (tokenObj.token !== token || tokenObj.expiresAt < now) {
-      throw new HttpException(
-        { error: 'Token not found or expired !' },
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException({ error: "Token not found or expired !" }, HttpStatus.CONFLICT);
     }
 
     await this.usersService.validateUser(userId);
 
     await this.deleteToken(tokenObj.id);
 
-    return { message: 'User validated !' };
+    return { message: "User validated !" };
   }
 
   async resendToken(payload: CreateTokenDto) {

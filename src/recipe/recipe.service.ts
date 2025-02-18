@@ -257,82 +257,85 @@ export class RecipeService {
     const { userId, title, servings, preparationTime, type, ingredients, steps } = payload;
 
     try {
-      return await this.prismaService.$transaction(async (tsx) => {
-        const newRecipe = await tsx.recipes.create({
-          data: {
-            title,
-            userId,
-            servings,
-            preparationTime,
-            type,
-          },
-        });
-
-        for (let ingredient of ingredients) {
-          const { foodId, name, measures, unit, calories, carbs, proteins, fats } = ingredient;
-
-          const existentIngredient = await this.ingredientsService.getIngredient(foodId);
-
-          let ingredientId: number;
-
-          if (existentIngredient) {
-            ingredientId = existentIngredient.id;
-          } else {
-            const payload = {
-              foodId,
-              name,
-            };
-
-            const newIngredient = await this.ingredientsService.addIngredient(payload);
-
-            ingredientId = newIngredient.id;
-          }
-
-          for (let measure of measures) {
-            const { uri, label } = measure;
-
-            const payload = {
-              uri,
-              label,
-            };
-
-            const exitingMeasure = await this.unitsService.getUnit(payload);
-
-            if (exitingMeasure) {
-            } else {
-              await this.unitsService.addUnit(payload);
-            }
-          }
-
-          const ingredientUnit = await tsx.units.findFirst({
-            where: {
-              label: unit,
-            },
-          });
-
-          await tsx.recipes_ingredients.create({
+      return await this.prismaService.$transaction(
+        async (tsx) => {
+          const newRecipe = await tsx.recipes.create({
             data: {
-              recipeId: newRecipe.id,
-              ingredientId,
-              unitId: ingredientUnit.id,
-              quantity: ingredient.quantity,
-              calories,
-              proteins,
-              carbs,
-              fats,
+              title,
+              userId,
+              servings,
+              preparationTime,
+              type,
             },
           });
-        }
-        const stepsPayload = steps.map((step) => ({
-          recipeId: newRecipe.id,
-          step: step.step,
-          text: step.text,
-        }));
-        await tsx.steps.createMany({
-          data: stepsPayload,
-        });
-        return newRecipe;
-      });
+
+          for (let ingredient of ingredients) {
+            const { foodId, name, measures, unit, calories, carbs, proteins, fats } = ingredient;
+
+            const existentIngredient = await this.ingredientsService.getIngredient(foodId);
+
+            let ingredientId: number;
+
+            if (existentIngredient) {
+              ingredientId = existentIngredient.id;
+            } else {
+              const payload = {
+                foodId,
+                name,
+              };
+
+              const newIngredient = await this.ingredientsService.addIngredient(payload);
+
+              ingredientId = newIngredient.id;
+            }
+
+            for (let measure of measures) {
+              const { uri, label } = measure;
+
+              const payload = {
+                uri,
+                label,
+              };
+
+              const exitingMeasure = await this.unitsService.getUnit(payload);
+
+              if (exitingMeasure) {
+              } else {
+                await this.unitsService.addUnit(payload);
+              }
+            }
+
+            const ingredientUnit = await tsx.units.findFirst({
+              where: {
+                label: unit,
+              },
+            });
+
+            await tsx.recipes_ingredients.create({
+              data: {
+                recipeId: newRecipe.id,
+                ingredientId,
+                unitId: ingredientUnit.id,
+                quantity: ingredient.quantity,
+                calories,
+                proteins,
+                carbs,
+                fats,
+              },
+            });
+          }
+          const stepsPayload = steps.map((step) => ({
+            recipeId: newRecipe.id,
+            step: step.step,
+            text: step.text,
+          }));
+          await tsx.steps.createMany({
+            data: stepsPayload,
+          });
+          return newRecipe;
+        },
+        { timeout: 20000 },
+      );
     } catch (error) {
       console.log(error);
 
