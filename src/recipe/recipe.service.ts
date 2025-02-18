@@ -9,7 +9,7 @@ import {
   RecipesDto,
   RecipesPerUserDto,
 } from "./dtos/recipe.dtos";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { IngredientsService } from "src/ingredients/ingredients.service";
 import { UnitsService } from "src/units/units.service";
 

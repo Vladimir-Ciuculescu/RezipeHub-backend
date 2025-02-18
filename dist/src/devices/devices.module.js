@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DevicesModule = void 0;
 const common_1 = require("@nestjs/common");
 const devices_service_1 = require("./devices.service");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 let DevicesModule = class DevicesModule {
 };
 exports.DevicesModule = DevicesModule;

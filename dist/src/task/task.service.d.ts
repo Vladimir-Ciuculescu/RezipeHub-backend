@@ -1,5 +1,5 @@
 import Expo from "expo-server-sdk";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { AiService } from "src/ai/ai.service";
 export declare class TaskService {
     private readonly prismaService;

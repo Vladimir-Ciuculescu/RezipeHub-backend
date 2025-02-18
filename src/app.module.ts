@@ -15,7 +15,7 @@ import { FavoritesModule } from "./favorites/favorites.module";
 import { NotificationsService } from "./notifications/notifications.service";
 import { DevicesService } from "./devices/devices.service";
 import { DevicesModule } from "./devices/devices.module";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { ExpoModule } from "./expo/expo.module";
 import Expo from "expo-server-sdk";
 import { ExpoService } from "./expo/expo.service";

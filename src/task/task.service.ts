@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import Expo, { ExpoPushMessage } from "expo-server-sdk";
 import { ChatCompletionMessageParam } from "openai/resources";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { AiService } from "src/ai/ai.service";
 
 @Injectable()

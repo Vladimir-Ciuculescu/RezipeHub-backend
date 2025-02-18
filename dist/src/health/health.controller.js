@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HealthController = void 0;
 const common_1 = require("@nestjs/common");
 const terminus_1 = require("@nestjs/terminus");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 let HealthController = class HealthController {
     constructor(health, http, db, prismaService) {
         this.health = health;

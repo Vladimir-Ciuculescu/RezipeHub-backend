@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { hashPassword } from "src/utils/hashPassword";
 import { EmailService } from "src/email/email.service";

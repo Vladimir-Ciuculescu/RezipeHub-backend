@@ -1,5 +1,5 @@
 /// <reference types="multer" />
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { EmailService } from "src/email/email.service";
 import { TokenService } from "src/token/token.service";

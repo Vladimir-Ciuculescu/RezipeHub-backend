@@ -1,7 +1,7 @@
 import { JwtService } from "@nestjs/jwt";
 import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
 import { UsersService } from "src/public/users/users.service";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
 import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
 import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";

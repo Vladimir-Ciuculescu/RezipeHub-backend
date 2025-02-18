@@ -1,4 +1,4 @@
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { CreateTokenDto } from "./dtos/create-token.dto";
 import { EmailService } from "src/email/email.service";
 import { ConfirmTokenDto } from "./dtos/confirm-token.dto";

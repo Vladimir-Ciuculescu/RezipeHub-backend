@@ -10,7 +10,7 @@ exports.UnitsModule = void 0;
 const common_1 = require("@nestjs/common");
 const units_controller_1 = require("./units.controller");
 const units_service_1 = require("./units.service");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 let UnitsModule = class UnitsModule {
 };
 exports.UnitsModule = UnitsModule;

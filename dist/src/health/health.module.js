@@ -11,7 +11,7 @@ const common_1 = require("@nestjs/common");
 const terminus_1 = require("@nestjs/terminus");
 const health_controller_1 = require("./health.controller");
 const axios_1 = require("@nestjs/axios");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 let HealthModule = class HealthModule {
 };
 exports.HealthModule = HealthModule;

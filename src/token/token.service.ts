@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { generateToken } from "src/utils/generateToken";
 import { CreateTokenDto } from "./dtos/create-token.dto";
 import { EmailService } from "src/email/email.service";

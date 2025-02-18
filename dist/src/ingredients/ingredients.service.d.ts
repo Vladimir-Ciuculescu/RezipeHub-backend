@@ -1,5 +1,5 @@
-import { PrismaService } from 'prisma.service';
-import { CreateIngredientDto } from './dtos/ingredient.dto';
+import { PrismaService } from "src/prisma.service";
+import { CreateIngredientDto } from "./dtos/ingredient.dto";
 export declare class IngredientsService {
     private readonly prsimaService;
     constructor(prsimaService: PrismaService);

@@ -1,5 +1,5 @@
 import { BadGatewayException, Injectable } from "@nestjs/common";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { GetFavoritesDto, IsFavoriteDto } from "./favorites.dto";
 import { NotificationsService } from "src/notifications/notifications.service";
 

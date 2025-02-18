@@ -13,7 +13,7 @@ exports.TaskService = void 0;
 const common_1 = require("@nestjs/common");
 const schedule_1 = require("@nestjs/schedule");
 const expo_server_sdk_1 = require("expo-server-sdk");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 const ai_service_1 = require("../ai/ai.service");
 let TaskService = class TaskService {
     constructor(prismaService, Expo, aiService) {

@@ -10,7 +10,7 @@ exports.IngredientsModule = void 0;
 const common_1 = require("@nestjs/common");
 const ingredients_controller_1 = require("./ingredients.controller");
 const ingredients_service_1 = require("./ingredients.service");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 let IngredientsModule = class IngredientsModule {
 };
 exports.IngredientsModule = IngredientsModule;

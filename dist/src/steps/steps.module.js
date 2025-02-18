@@ -10,7 +10,7 @@ exports.StepModule = void 0;
 const common_1 = require("@nestjs/common");
 const steps_controller_1 = require("./steps.controller");
 const steps_service_1 = require("./steps.service");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 let StepModule = class StepModule {
 };
 exports.StepModule = StepModule;

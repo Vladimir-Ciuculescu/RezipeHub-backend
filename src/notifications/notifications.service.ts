@@ -1,5 +1,5 @@
 import { BadGatewayException, Injectable } from "@nestjs/common";
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { ExpoService } from "src/expo/expo.service";
 import { MarkAsReadDto, ResetBadgeCountDto } from "./notifications.dto";
 

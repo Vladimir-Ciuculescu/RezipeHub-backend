@@ -1,4 +1,4 @@
-import { PrismaService } from "prisma.service";
+import { PrismaService } from "src/prisma.service";
 import { UnitDto } from "./dtos/units.dto";
 export declare class UnitsService {
     private readonly prismaService;

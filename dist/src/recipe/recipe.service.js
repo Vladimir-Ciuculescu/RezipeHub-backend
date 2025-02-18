@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecipeService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../../prisma.service");
+const prisma_service_1 = require("../prisma.service");
 const ingredients_service_1 = require("../ingredients/ingredients.service");
 const units_service_1 = require("../units/units.service");
 let RecipeService = class RecipeService {
