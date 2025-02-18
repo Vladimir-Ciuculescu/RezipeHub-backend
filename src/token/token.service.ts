@@ -28,7 +28,8 @@ export class TokenService {
           token,
           type: TokenType.ACCOUNT_VERIFICATION,
           // expiresAt: moment().add(24, "hours").toDate(),
-          expiresAt: dayjs().add(24, "hour").toISOString(),
+          // expiresAt: dayjs().add(24, "hour").toISOString(),
+          expiresAt: "",
         },
       });
     } catch (error) {
@@ -62,7 +63,8 @@ export class TokenService {
           token: newToken,
           type: TokenType.PASSWORD_RESET,
           // expiresAt: moment().add(1, 'hours').toDate(),
-          expiresAt: dayjs().add(24, "hour").toISOString(),
+          // expiresAt: dayjs().add(24, "hour").toISOString(),
+          expiresAt: "",
         },
       });
 
