@@ -1,5 +1,5 @@
-import { PrismaService } from "src/prisma.service";
 import { UnitDto } from "./dtos/units.dto";
+import { PrismaService } from "../prisma.service";
 export declare class UnitsService {
     private readonly prismaService;
     constructor(prismaService: PrismaService);

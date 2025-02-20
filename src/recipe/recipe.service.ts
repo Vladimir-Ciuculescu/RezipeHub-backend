@@ -9,9 +9,9 @@ import {
   RecipesDto,
   RecipesPerUserDto,
 } from "./dtos/recipe.dtos";
-import { PrismaService } from "src/prisma.service";
-import { IngredientsService } from "src/ingredients/ingredients.service";
-import { UnitsService } from "src/units/units.service";
+import { PrismaService } from "../prisma.service";
+import { IngredientsService } from "../ingredients/ingredients.service";
+import { UnitsService } from "../units/units.service";
 
 @Injectable()
 export class RecipeService {

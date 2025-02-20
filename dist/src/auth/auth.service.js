@@ -15,12 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
-const users_service_1 = require("../public/users/users.service");
 const bcrypt = require("bcrypt");
 const prisma_service_1 = require("../prisma.service");
-const enums_1 = require("../../types/enums");
-const hashPassword_1 = require("../utils/hashPassword");
+const users_service_1 = require("../public/users/users.service");
 const devices_service_1 = require("../devices/devices.service");
+const hashPassword_1 = require("../utils/hashPassword");
+const enums_1 = require("../../types/enums");
 let AuthService = class AuthService {
     constructor(usersService, jwtService, prismaService, devicesService) {
         this.usersService = usersService;

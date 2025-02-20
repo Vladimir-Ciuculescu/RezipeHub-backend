@@ -1,4 +1,4 @@
-import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
+import { UserRequestDto } from "../public/users/dtos/user-request.dto";
 declare global {
     namespace Express {
         interface Request {

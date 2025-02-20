@@ -16,8 +16,8 @@ exports.S3Controller = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const s3_service_1 = require("./s3.service");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const s3_dtos_1 = require("./s3.dtos");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let S3Controller = class S3Controller {
     constructor(s3Service) {
         this.s3Service = s3Service;

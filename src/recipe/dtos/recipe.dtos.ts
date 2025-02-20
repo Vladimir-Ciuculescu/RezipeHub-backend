@@ -1,8 +1,8 @@
 import { Expose, Transform, Type } from "class-transformer";
 import { ArrayMinSize, IsArray, IsEnum, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { EditIngredientDto, IngredientDto } from "src/ingredients/dtos/ingredient.dto";
-import { EditStepDto, StepDto } from "src/steps/dtos/steps.dto";
-import { RecipeType } from "types/enums";
+import { RecipeType } from "../../../types/enums";
+import { EditIngredientDto, IngredientDto } from "../../ingredients/dtos/ingredient.dto";
+import { EditStepDto, StepDto } from "../../steps/dtos/steps.dto";
 
 export class CreateRecipeDto {
   @IsNumber()

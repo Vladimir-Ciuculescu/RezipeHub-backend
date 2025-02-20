@@ -1,14 +1,16 @@
 import { Module } from "@nestjs/common";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
-import { PrismaService } from "src/prisma.service";
-import { AuthService } from "src/auth/auth.service";
+
 import { JwtService } from "@nestjs/jwt";
-import { EmailService } from "src/email/email.service";
-import { TokenService } from "src/token/token.service";
-import { S3Service } from "src/s3/s3.service";
+
 import { S3Client } from "@aws-sdk/client-s3";
-import { DevicesService } from "src/devices/devices.service";
+import { EmailService } from "../../email/email.service";
+import { TokenService } from "../../token/token.service";
+import { S3Service } from "../../s3/s3.service";
+import { DevicesService } from "../../devices/devices.service";
+import { AuthService } from "../../auth/auth.service";
+import { PrismaService } from "../../prisma.service";
 
 @Module({
   controllers: [UsersController],

@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { ArrayMinSize, IsArray, IsNumber, IsOptional, IsString, ValidateIf, ValidateNested } from "class-validator";
-import { CreateUnitDto } from "src/units/dtos/units.dto";
+import { CreateUnitDto } from "../../units/dtos/units.dto";
 
 export class IngredientDto {
   @IsString()

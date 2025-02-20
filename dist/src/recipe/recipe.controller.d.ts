@@ -7,27 +7,27 @@ export declare class RecipeController {
     getLatestRecipes(query: LatestRecipesDto): Promise<{
         isInFavorites: boolean;
         id: number;
+        title: string;
+        photoUrl: string;
+        preparationTime: number;
         user: {
-            firstName: string;
-            lastName: string;
             id: number;
             photoUrl: string;
+            firstName: string;
+            lastName: string;
         };
-        photoUrl: string;
-        title: string;
-        preparationTime: number;
     }[]>;
     getMostPopularRecipes(query: MostPopularRecipesDto): Promise<{
         id: number;
+        title: string;
+        photoUrl: string;
+        preparationTime: number;
         user: {
-            firstName: string;
-            lastName: string;
             id: number;
             photoUrl: string;
+            firstName: string;
+            lastName: string;
         };
-        photoUrl: string;
-        title: string;
-        preparationTime: number;
         user_favorites: {
             id: number;
             recipeId: number;
@@ -37,15 +37,15 @@ export declare class RecipeController {
     }[]>;
     getRecipesByCategory(query: ByCategoryRecipesDto): Promise<{
         id: number;
+        title: string;
+        photoUrl: string;
+        preparationTime: number;
         user: {
-            firstName: string;
-            lastName: string;
             id: number;
             photoUrl: string;
+            firstName: string;
+            lastName: string;
         };
-        photoUrl: string;
-        title: string;
-        preparationTime: number;
         user_favorites: {
             id: number;
             recipeId: number;

@@ -14,10 +14,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const users_dto_1 = require("./users.dto");
 const users_service_1 = require("./users.service");
 const platform_express_1 = require("@nestjs/platform-express");
+const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;

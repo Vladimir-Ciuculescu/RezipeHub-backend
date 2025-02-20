@@ -10,12 +10,12 @@ exports.RecipeModule = void 0;
 const common_1 = require("@nestjs/common");
 const recipe_controller_1 = require("./recipe.controller");
 const recipe_service_1 = require("./recipe.service");
-const prisma_service_1 = require("../prisma.service");
-const s3_service_1 = require("../s3/s3.service");
 const client_s3_1 = require("@aws-sdk/client-s3");
+const prisma_service_1 = require("../prisma.service");
 const ingredients_service_1 = require("../ingredients/ingredients.service");
 const units_service_1 = require("../units/units.service");
 const steps_service_1 = require("../steps/steps.service");
+const s3_service_1 = require("../s3/s3.service");
 let RecipeModule = class RecipeModule {
 };
 exports.RecipeModule = RecipeModule;

@@ -10,10 +10,10 @@ exports.FavoritesModule = void 0;
 const common_1 = require("@nestjs/common");
 const favorites_controller_1 = require("./favorites.controller");
 const favorites_service_1 = require("./favorites.service");
-const prisma_service_1 = require("../prisma.service");
-const notifications_service_1 = require("../notifications/notifications.service");
 const expo_server_sdk_1 = require("expo-server-sdk");
+const prisma_service_1 = require("../prisma.service");
 const expo_service_1 = require("../expo/expo.service");
+const notifications_service_1 = require("../notifications/notifications.service");
 let FavoritesModule = class FavoritesModule {
 };
 exports.FavoritesModule = FavoritesModule;

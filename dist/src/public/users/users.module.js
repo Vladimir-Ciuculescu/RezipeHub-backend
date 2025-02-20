@@ -10,14 +10,14 @@ exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
 const users_controller_1 = require("./users.controller");
 const users_service_1 = require("./users.service");
-const prisma_service_1 = require("../../prisma.service");
-const auth_service_1 = require("../../auth/auth.service");
 const jwt_1 = require("@nestjs/jwt");
+const client_s3_1 = require("@aws-sdk/client-s3");
 const email_service_1 = require("../../email/email.service");
 const token_service_1 = require("../../token/token.service");
 const s3_service_1 = require("../../s3/s3.service");
-const client_s3_1 = require("@aws-sdk/client-s3");
 const devices_service_1 = require("../../devices/devices.service");
+const auth_service_1 = require("../../auth/auth.service");
+const prisma_service_1 = require("../../prisma.service");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;

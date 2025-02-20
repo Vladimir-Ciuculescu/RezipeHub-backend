@@ -1,6 +1,6 @@
 import { ExecutionContext, createParamDecorator } from "@nestjs/common";
 import { Request } from "express";
-import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
+import { UserRequestDto } from "../public/users/dtos/user-request.dto";
 
 declare global {
   namespace Express {

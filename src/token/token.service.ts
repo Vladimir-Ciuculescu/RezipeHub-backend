@@ -1,13 +1,14 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
-import { PrismaService } from "src/prisma.service";
-import { generateToken } from "src/utils/generateToken";
+
 import { CreateTokenDto } from "./dtos/create-token.dto";
-import { EmailService } from "src/email/email.service";
 import { ConfirmTokenDto } from "./dtos/confirm-token.dto";
-import { UsersService } from "src/public/users/users.service";
 import { TokenType } from "types/enums";
-import { SendResetEmailDto } from "src/public/users/dtos/send-reset-email.dto";
 import * as dayjs from "dayjs";
+import { PrismaService } from "../prisma.service";
+import { EmailService } from "../email/email.service";
+import { UsersService } from "../public/users/users.service";
+import { SendResetEmailDto } from "../public/users/dtos/send-reset-email.dto";
+import { generateToken } from "../utils/generateToken";
 
 @Injectable()
 export class TokenService {

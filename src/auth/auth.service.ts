@@ -8,18 +8,21 @@ import {
   forwardRef,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
-import { UsersService } from "src/public/users/users.service";
+
 import * as bcrypt from "bcrypt";
-import { PrismaService } from "src/prisma.service";
-import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
-import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
-import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
-import { TokenType } from "types/enums";
-import { hashPassword } from "src/utils/hashPassword";
-import { DevicesService } from "src/devices/devices.service";
-import { AddDeviceDto } from "src/devices/devices.dto";
-import { UserLogoutDto } from "src/public/users/dtos/user-logout.dto";
+import { PrismaService } from "../prisma.service";
+// import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
+
+import { UserRequestDto } from "../public/users/dtos/user-request.dto";
+import { UsersService } from "../public/users/users.service";
+import { CreateUserDto } from "../public/users/dtos/create-user.dto";
+import { DevicesService } from "../devices/devices.service";
+import { AddDeviceDto } from "../devices/devices.dto";
+import { SocialUserRequestDto } from "../public/users/dtos/social-user-request.dto";
+import { ResetPasswordRequestDto } from "../public/users/dtos/reset-password-request.dto";
+import { hashPassword } from "../utils/hashPassword";
+import { UserLogoutDto } from "../public/users/dtos/user-logout.dto";
+import { TokenType } from "../../types/enums";
 
 @Injectable()
 export class AuthService {

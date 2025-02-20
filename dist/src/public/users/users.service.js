@@ -14,13 +14,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
 const prisma_service_1 = require("../../prisma.service");
-const hashPassword_1 = require("../../utils/hashPassword");
 const email_service_1 = require("../../email/email.service");
 const token_service_1 = require("../../token/token.service");
-const generateToken_1 = require("../../utils/generateToken");
-const jwt_1 = require("@nestjs/jwt");
 const s3_service_1 = require("../../s3/s3.service");
+const hashPassword_1 = require("../../utils/hashPassword");
+const generateToken_1 = require("../../utils/generateToken");
 let UsersService = class UsersService {
     constructor(prismaService, emailService, tokenService, jwtService, s3Service) {
         this.prismaService = prismaService;

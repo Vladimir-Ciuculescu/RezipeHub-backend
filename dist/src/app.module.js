@@ -24,7 +24,6 @@ const favorites_module_1 = require("./favorites/favorites.module");
 const notifications_service_1 = require("./notifications/notifications.service");
 const devices_service_1 = require("./devices/devices.service");
 const devices_module_1 = require("./devices/devices.module");
-const prisma_service_1 = require("./prisma.service");
 const expo_module_1 = require("./expo/expo.module");
 const expo_server_sdk_1 = require("expo-server-sdk");
 const expo_service_1 = require("./expo/expo.service");
@@ -34,6 +33,7 @@ const task_service_1 = require("./task/task.service");
 const ai_service_1 = require("./ai/ai.service");
 const health_module_1 = require("./health/health.module");
 const terminus_1 = require("@nestjs/terminus");
+const prisma_service_1 = require("./prisma.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;

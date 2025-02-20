@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FavoritesService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma.service");
 const notifications_service_1 = require("../notifications/notifications.service");
+const prisma_service_1 = require("../prisma.service");
 let FavoritesService = class FavoritesService {
     constructor(prismaService, notificationsService) {
         this.prismaService = prismaService;

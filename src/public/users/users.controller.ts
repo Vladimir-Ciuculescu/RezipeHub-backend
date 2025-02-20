@@ -1,9 +1,8 @@
 import { Body, Controller, Get, HttpCode, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { EditProfileDto, GetProfileDto } from "./users.dto";
 import { UsersService } from "./users.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
+import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
 
 @Controller("users")
 export class UsersController {

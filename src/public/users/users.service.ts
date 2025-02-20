@@ -1,14 +1,15 @@
 import { HttpException, HttpStatus, Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
-import { PrismaService } from "src/prisma.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
-import { hashPassword } from "src/utils/hashPassword";
-import { EmailService } from "src/email/email.service";
-import { TokenService } from "src/token/token.service";
-import { generateToken } from "src/utils/generateToken";
-import { CreateTokenDto } from "src/token/dtos/create-token.dto";
+
 import { EditProfileDto, GetProfileDto } from "./users.dto";
 import { JwtService } from "@nestjs/jwt";
-import { S3Service } from "src/s3/s3.service";
+import { PrismaService } from "../../prisma.service";
+import { EmailService } from "../../email/email.service";
+import { TokenService } from "../../token/token.service";
+import { S3Service } from "../../s3/s3.service";
+import { hashPassword } from "../../utils/hashPassword";
+import { generateToken } from "../../utils/generateToken";
+import { CreateTokenDto } from "../../token/dtos/create-token.dto";
 
 @Injectable()
 export class UsersService {

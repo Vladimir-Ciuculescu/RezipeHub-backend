@@ -1,5 +1,5 @@
 import { IsEnum, IsString } from "class-validator";
-import { Platforms } from "types/enums";
+import { Platforms } from "../../../../types/enums";
 
 export class UserLoginDto {
   @IsString()

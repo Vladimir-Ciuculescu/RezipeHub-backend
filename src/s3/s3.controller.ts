@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, HttpCode, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { S3Service } from "./s3.service";
-import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { DeleteImageRecipeFromS3Dto } from "./s3.dtos";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("s3")
 export class S3Controller {

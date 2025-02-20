@@ -1,6 +1,6 @@
-import { PrismaService } from "src/prisma.service";
 import { AddDeviceDto } from "./devices.dto";
-import { ToggleNotificationsDto } from "src/notifications/notifications.dto";
+import { PrismaService } from "../prisma.service";
+import { ToggleNotificationsDto } from "../notifications/notifications.dto";
 export declare class DevicesService {
     private readonly prismaService;
     constructor(prismaService: PrismaService);

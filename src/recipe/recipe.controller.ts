@@ -11,8 +11,8 @@ import {
   RecipesDto,
   RecipesPerUserDto,
 } from "./dtos/recipe.dtos";
-import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
-import { SerializeInterceptor } from "src/interceptors/serialize.interceptor";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { SerializeInterceptor } from "../interceptors/serialize.interceptor";
 
 @Controller("recipes")
 export class RecipeController {

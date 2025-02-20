@@ -5,13 +5,13 @@ export declare class FavoritesController {
     constructor(favoritesService: FavoritesService);
     getFavorites(query: GetFavoritesDto): Promise<{
         id: number;
+        photoUrl: string;
         user: {
+            id: number;
             firstName: string;
             lastName: string;
-            id: number;
             photoUrl: string;
         };
-        photoUrl: string;
         title: string;
     }[]>;
     getIsInFavorites(query: IsFavoriteDto): Promise<0 | 1>;

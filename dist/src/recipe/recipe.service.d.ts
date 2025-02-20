@@ -1,7 +1,7 @@
 import { ByCategoryRecipesDto, CreateRecipeDto, EditRecipeDto, EditRecipePhotoDto, LatestRecipesDto, MostPopularRecipesDto, RecipesDto, RecipesPerUserDto } from "./dtos/recipe.dtos";
-import { PrismaService } from "src/prisma.service";
-import { IngredientsService } from "src/ingredients/ingredients.service";
-import { UnitsService } from "src/units/units.service";
+import { PrismaService } from "../prisma.service";
+import { IngredientsService } from "../ingredients/ingredients.service";
+import { UnitsService } from "../units/units.service";
 export declare class RecipeService {
     private readonly prismaService;
     private readonly ingredientsService;
@@ -10,27 +10,27 @@ export declare class RecipeService {
     getLatestRecipes(query: LatestRecipesDto): Promise<{
         isInFavorites: boolean;
         id: number;
+        title: string;
+        photoUrl: string;
+        preparationTime: number;
         user: {
-            firstName: string;
-            lastName: string;
             id: number;
             photoUrl: string;
+            firstName: string;
+            lastName: string;
         };
-        photoUrl: string;
-        title: string;
-        preparationTime: number;
     }[]>;
     getMostPopularRecipes(query: MostPopularRecipesDto): Promise<{
         id: number;
+        title: string;
+        photoUrl: string;
+        preparationTime: number;
         user: {
-            firstName: string;
-            lastName: string;
             id: number;
             photoUrl: string;
+            firstName: string;
+            lastName: string;
         };
-        photoUrl: string;
-        title: string;
-        preparationTime: number;
         user_favorites: {
             id: number;
             recipeId: number;
@@ -40,15 +40,15 @@ export declare class RecipeService {
     }[]>;
     getRecipesByCategory(query: ByCategoryRecipesDto): Promise<{
         id: number;
+        title: string;
+        photoUrl: string;
+        preparationTime: number;
         user: {
-            firstName: string;
-            lastName: string;
             id: number;
             photoUrl: string;
+            firstName: string;
+            lastName: string;
         };
-        photoUrl: string;
-        title: string;
-        preparationTime: number;
         user_favorites: {
             id: number;
             recipeId: number;

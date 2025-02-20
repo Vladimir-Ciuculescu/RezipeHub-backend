@@ -1,8 +1,8 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { NotificationsService } from "./notifications.service";
-import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { MarkAsReadDto, NotificationsDto, ResetBadgeCountDto, ToggleNotificationsDto } from "./notifications.dto";
-import { DevicesService } from "src/devices/devices.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { DevicesService } from "../devices/devices.service";
 
 @Controller("notifications")
 export class NotificationsController {

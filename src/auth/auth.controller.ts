@@ -14,16 +14,16 @@ import {
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
-import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
-import { CurrentUser } from "src/decorators/current-user.decorator";
-import { SerializeInterceptor } from "src/interceptors/serialize.interceptor";
-import { UserDto } from "src/public/users/dtos/user.dto";
 import { RefreshJwtGuard } from "./guards/refresh-jwt.guard";
-import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
-import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
-import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
-import { UserLoginDto } from "src/public/users/dtos/user-login.dto";
-import { UserLogoutDto } from "src/public/users/dtos/user-logout.dto";
+import { UserLogoutDto } from "../public/users/dtos/user-logout.dto";
+import { UserLoginDto } from "../public/users/dtos/user-login.dto";
+import { CreateUserDto } from "../public/users/dtos/create-user.dto";
+import { CurrentUser } from "../decorators/current-user.decorator";
+import { UserRequestDto } from "../public/users/dtos/user-request.dto";
+import { SocialUserRequestDto } from "../public/users/dtos/social-user-request.dto";
+import { ResetPasswordRequestDto } from "../public/users/dtos/reset-password-request.dto";
+import { UserDto } from "../public/users/dtos/user.dto";
+import { SerializeInterceptor } from "../interceptors/serialize.interceptor";
 
 @Controller("auth")
 export class AuthController {

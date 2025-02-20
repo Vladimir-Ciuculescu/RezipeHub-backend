@@ -1,4 +1,4 @@
-import { SocialProvider } from "types/enums";
+import { SocialProvider } from "../../../../types/enums";
 export declare class SocialUserRequestDto {
     provider: SocialProvider;
     providerUserId: string;

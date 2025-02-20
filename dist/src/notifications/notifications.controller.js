@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsController = void 0;
 const common_1 = require("@nestjs/common");
 const notifications_service_1 = require("./notifications.service");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const notifications_dto_1 = require("./notifications.dto");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const devices_service_1 = require("../devices/devices.service");
 let NotificationsController = class NotificationsController {
     constructor(notificationsService, devicesService) {

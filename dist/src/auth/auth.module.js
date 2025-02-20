@@ -8,20 +8,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
+const passport_1 = require("@nestjs/passport");
+const client_s3_1 = require("@aws-sdk/client-s3");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
-const users_service_1 = require("../public/users/users.service");
 const prisma_service_1 = require("../prisma.service");
 const local_strategy_1 = require("./strategies/local.strategy");
-const passport_1 = require("@nestjs/passport");
-const jwt_1 = require("@nestjs/jwt");
-const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const refresh_jwt_strategy_1 = require("./strategies/refresh-jwt.strategy");
+const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const email_service_1 = require("../email/email.service");
 const token_service_1 = require("../token/token.service");
 const s3_service_1 = require("../s3/s3.service");
-const client_s3_1 = require("@aws-sdk/client-s3");
 const devices_service_1 = require("../devices/devices.service");
+const users_service_1 = require("../public/users/users.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -43,7 +43,6 @@ exports.AuthModule = AuthModule = __decorate([
             local_strategy_1.LocalStrategy,
             jwt_strategy_1.JwtStrategy,
             refresh_jwt_strategy_1.RefreshJwtStrategy,
-            users_service_1.UsersService,
             s3_service_1.S3Service,
             client_s3_1.S3Client,
             devices_service_1.DevicesService,

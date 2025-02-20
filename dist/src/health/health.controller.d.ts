@@ -1,5 +1,5 @@
 import { HealthCheckService, HttpHealthIndicator, TypeOrmHealthIndicator } from "@nestjs/terminus";
-import { PrismaService } from "src/prisma.service";
+import { PrismaService } from "../prisma.service";
 export declare class HealthController {
     private health;
     private http;

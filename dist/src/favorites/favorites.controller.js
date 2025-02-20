@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FavoritesController = void 0;
 const common_1 = require("@nestjs/common");
 const favorites_service_1 = require("./favorites.service");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const favorites_dto_1 = require("./favorites.dto");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let FavoritesController = class FavoritesController {
     constructor(favoritesService) {
         this.favoritesService = favoritesService;

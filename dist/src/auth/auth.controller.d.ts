@@ -1,10 +1,10 @@
 import { AuthService } from "./auth.service";
-import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
-import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
-import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
-import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
-import { UserLoginDto } from "src/public/users/dtos/user-login.dto";
-import { UserLogoutDto } from "src/public/users/dtos/user-logout.dto";
+import { UserLogoutDto } from "../public/users/dtos/user-logout.dto";
+import { UserLoginDto } from "../public/users/dtos/user-login.dto";
+import { CreateUserDto } from "../public/users/dtos/create-user.dto";
+import { UserRequestDto } from "../public/users/dtos/user-request.dto";
+import { SocialUserRequestDto } from "../public/users/dtos/social-user-request.dto";
+import { ResetPasswordRequestDto } from "../public/users/dtos/reset-password-request.dto";
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);

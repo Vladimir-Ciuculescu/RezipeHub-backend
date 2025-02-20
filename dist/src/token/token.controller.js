@@ -35,7 +35,7 @@ let TokenController = class TokenController {
 exports.TokenController = TokenController;
 __decorate([
     (0, common_1.HttpCode)(200),
-    (0, common_1.Post)('/confirm'),
+    (0, common_1.Post)("/confirm"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [confirm_token_dto_1.ConfirmTokenDto]),
@@ -43,7 +43,7 @@ __decorate([
 ], TokenController.prototype, "confirmToken", null);
 __decorate([
     (0, common_1.HttpCode)(201),
-    (0, common_1.Post)('/resend'),
+    (0, common_1.Post)("/resend"),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_token_dto_1.CreateTokenDto]),
@@ -51,14 +51,14 @@ __decorate([
 ], TokenController.prototype, "resendToken", null);
 __decorate([
     (0, common_1.HttpCode)(200),
-    (0, common_1.Post)('/send-reset-email'),
+    (0, common_1.Post)("/send-reset-email"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [send_reset_email_dto_1.SendResetEmailDto]),
     __metadata("design:returntype", void 0)
 ], TokenController.prototype, "sendResetEmail", null);
 exports.TokenController = TokenController = __decorate([
-    (0, common_1.Controller)('token'),
+    (0, common_1.Controller)("token"),
     __metadata("design:paramtypes", [token_service_1.TokenService])
 ], TokenController);
 //# sourceMappingURL=token.controller.js.map

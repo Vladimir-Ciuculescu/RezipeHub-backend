@@ -1,12 +1,12 @@
 import { JwtService } from "@nestjs/jwt";
-import { CreateUserDto } from "src/public/users/dtos/create-user.dto";
-import { UsersService } from "src/public/users/users.service";
-import { PrismaService } from "src/prisma.service";
-import { UserRequestDto } from "src/public/users/dtos/user-request.dto";
-import { SocialUserRequestDto } from "src/public/users/dtos/social-user-request.dto";
-import { ResetPasswordRequestDto } from "src/public/users/dtos/reset-password-request.dto";
-import { DevicesService } from "src/devices/devices.service";
-import { UserLogoutDto } from "src/public/users/dtos/user-logout.dto";
+import { PrismaService } from "../prisma.service";
+import { UserRequestDto } from "../public/users/dtos/user-request.dto";
+import { UsersService } from "../public/users/users.service";
+import { CreateUserDto } from "../public/users/dtos/create-user.dto";
+import { DevicesService } from "../devices/devices.service";
+import { SocialUserRequestDto } from "../public/users/dtos/social-user-request.dto";
+import { ResetPasswordRequestDto } from "../public/users/dtos/reset-password-request.dto";
+import { UserLogoutDto } from "../public/users/dtos/user-logout.dto";
 export declare class AuthService {
     private readonly usersService;
     private readonly jwtService;

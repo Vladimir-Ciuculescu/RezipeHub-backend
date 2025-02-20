@@ -1,6 +1,6 @@
 import { NotificationsService } from "./notifications.service";
 import { MarkAsReadDto, NotificationsDto, ResetBadgeCountDto, ToggleNotificationsDto } from "./notifications.dto";
-import { DevicesService } from "src/devices/devices.service";
+import { DevicesService } from "../devices/devices.service";
 export declare class NotificationsController {
     private readonly notificationsService;
     private readonly devicesService;
@@ -13,9 +13,9 @@ export declare class NotificationsController {
         body: string;
         read: boolean;
         actor: {
+            id: number;
             firstName: string;
             lastName: string;
-            id: number;
             photoUrl: string;
         };
     }[]>;

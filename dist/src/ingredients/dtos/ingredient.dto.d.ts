@@ -1,4 +1,4 @@
-import { CreateUnitDto } from "src/units/dtos/units.dto";
+import { CreateUnitDto } from "../../units/dtos/units.dto";
 export declare class IngredientDto {
     name: string;
     unit: string;

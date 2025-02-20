@@ -1,11 +1,11 @@
 /// <reference types="multer" />
-import { PrismaService } from "src/prisma.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
-import { EmailService } from "src/email/email.service";
-import { TokenService } from "src/token/token.service";
 import { EditProfileDto, GetProfileDto } from "./users.dto";
 import { JwtService } from "@nestjs/jwt";
-import { S3Service } from "src/s3/s3.service";
+import { PrismaService } from "../../prisma.service";
+import { EmailService } from "../../email/email.service";
+import { TokenService } from "../../token/token.service";
+import { S3Service } from "../../s3/s3.service";
 export declare class UsersService {
     private readonly prismaService;
     private readonly emailService;

@@ -1,6 +1,6 @@
-import { PrismaService } from "src/prisma.service";
-import { ExpoService } from "src/expo/expo.service";
 import { MarkAsReadDto, ResetBadgeCountDto } from "./notifications.dto";
+import { PrismaService } from "../prisma.service";
+import { ExpoService } from "../expo/expo.service";
 export declare class NotificationsService {
     private readonly prismaService;
     private readonly expoService;
@@ -13,9 +13,9 @@ export declare class NotificationsService {
         body: string;
         read: boolean;
         actor: {
+            id: number;
             firstName: string;
             lastName: string;
-            id: number;
             photoUrl: string;
         };
     }[]>;

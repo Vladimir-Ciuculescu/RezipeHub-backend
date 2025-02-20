@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { RecipeController } from "./recipe.controller";
 import { RecipeService } from "./recipe.service";
-import { PrismaService } from "src/prisma.service";
-import { S3Service } from "src/s3/s3.service";
 import { S3Client } from "@aws-sdk/client-s3";
-import { IngredientsService } from "src/ingredients/ingredients.service";
-import { UnitsService } from "src/units/units.service";
-import { StepsService } from "src/steps/steps.service";
+import { PrismaService } from "../prisma.service";
+import { IngredientsService } from "../ingredients/ingredients.service";
+import { UnitsService } from "../units/units.service";
+import { StepsService } from "../steps/steps.service";
+import { S3Service } from "../s3/s3.service";
 
 @Module({
   controllers: [RecipeController],
